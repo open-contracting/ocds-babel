@@ -1,7 +1,7 @@
 import os
 from tempfile import TemporaryDirectory
 
-from ocds_babel.extract import extract_codelist, extract_schema
+from ocds_babel.extract import extract_codelist, extract_schema, extract_extension_metadata
 
 codelist = b"""Code,Title,Description,Extension,Category
   foo  ,  bar  ,  baz  ,  bzz  ,  zzz  
@@ -24,6 +24,21 @@ schema = b"""{
         "title": "  zzz  ",
         "description": "    "
     }
+}"""
+
+metadata_language_map = b"""{
+    "name": {
+        "en": "  foo  "
+    },
+    "description": {
+        "en": "  bar  "
+    }
+}"""
+
+
+metadata = b"""{
+    "name": "  foo  ",
+    "description": "  bar  "
 }"""
 
 
@@ -73,3 +88,21 @@ def test_extract_schema():
         (1, '', 'bzz', ['/title/oneOf/1/description']),
         (1, '', 'zzz', ['/description/title']),
     ])
+
+
+def test_extract_extension_metadata():
+    assert_result('extension.json', metadata, extract_extension_metadata, [
+        (1, '', 'foo', ['/name']),
+        (1, '', 'bar', ['/description']),
+    ])
+
+
+def test_extract_extension_metadata_language_map():
+    assert_result('extension.json', metadata_language_map, extract_extension_metadata, [
+        (1, '', 'foo', ['/name/en']),
+        (1, '', 'bar', ['/description/en']),
+    ])
+
+
+def test_extract_extension_metadata_empty():
+    assert_result('extension.json', b'{}', extract_extension_metadata, [])

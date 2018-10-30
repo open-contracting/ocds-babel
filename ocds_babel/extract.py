@@ -9,6 +9,7 @@ from io import StringIO
 
 TRANSLATABLE_CODELIST_HEADERS = ('Title', 'Description', 'Extension')
 TRANSLATABLE_SCHEMA_KEYWORDS = ('title', 'description')
+TRANSLATABLE_EXTENSION_METADATA_KEYWORDS = ('name', 'description')
 
 
 def extract_codelist(fileobj, keywords, comment_tags, options):
@@ -23,11 +24,12 @@ def extract_codelist(fileobj, keywords, comment_tags, options):
 
     # Don't translate the titles of the hundreds of currencies.
     if os.path.basename(fileobj.name) != 'currency.csv':
-        for row_number, row in enumerate(reader, 1):
+        for lineno, row in enumerate(reader, 1):
             for key, value in row.items():
-                value = value.strip()
-                if key in TRANSLATABLE_CODELIST_HEADERS and value:
-                    yield row_number, '', value, [key]
+                if key in TRANSLATABLE_CODELIST_HEADERS and isinstance(value, str):
+                    value = value.strip()
+                    if value:
+                        yield lineno, '', value, [key]
 
 
 def extract_schema(fileobj, keywords, comment_tags, options):
@@ -40,12 +42,32 @@ def extract_schema(fileobj, keywords, comment_tags, options):
                 yield from gather_text(item, pointer='{}/{}'.format(pointer, index))
         elif isinstance(data, dict):
             for key, value in data.items():
-                if isinstance(value, str):
+                if key in TRANSLATABLE_SCHEMA_KEYWORDS and isinstance(value, str):
                     value = value.strip()
-                    if key in TRANSLATABLE_SCHEMA_KEYWORDS and value:
+                    if value:
                         yield value, '{}/{}'.format(pointer, key)
                 yield from gather_text(value, pointer='{}/{}'.format(pointer, key))
 
     data = json.loads(fileobj.read().decode())
     for text, pointer in gather_text(data):
         yield 1, '', text, [pointer]
+
+
+def extract_extension_metadata(fileobj, keywords, comment_tags, options):
+    """
+    Yields the "name" and "description" values of an extension.json file.
+    """
+    data = json.loads(fileobj.read().decode())
+    for key in TRANSLATABLE_EXTENSION_METADATA_KEYWORDS:
+        comment = '/' + key
+        value = data.get(key, {})
+
+        # Add language map.
+        if isinstance(value, dict):
+            comment += '/en'
+        else:
+            value = {'en': value}
+
+        value = value.get('en', '').strip()
+        if value:
+            yield 1, '', value, [comment]
