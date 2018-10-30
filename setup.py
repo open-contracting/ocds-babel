@@ -14,7 +14,7 @@ setup(
     packages=find_packages(),
     long_description=long_description,
     install_requires=[
-        'babel',
+        'Babel',
     ],
     extras_require={
         'test': [
