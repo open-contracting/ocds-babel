@@ -5,7 +5,7 @@ import logging
 import os
 from tempfile import TemporaryDirectory
 
-from ocds_babel.translate import translate_codelists, translate_schema
+from ocds_babel.translate import translate_codelists, translate_schema, translate_extension_metadata
 
 codelist = """Code,Title,Description
 open,  Open  ,  All interested suppliers may submit a tender.  
@@ -35,6 +35,14 @@ schema = """{
       }
     }
   }
+}"""
+
+extension_metadata = """{
+  "name": "  Location  ",
+  "description": "  Communicates the location of proposed or executed contract delivery.  ",
+  "compatibility": [
+    "1.1"
+  ]
 }"""
 
 
@@ -68,15 +76,15 @@ def test_translate_codelists(monkeypatch, caplog):
             with open(os.path.join(builddir, 'method.csv')) as f:
                 rows = [dict(row) for row in csv.DictReader(f)]
 
-            assert rows == [{
-                'Código': 'open',
-                'Descripción': 'Todos los proveedores interesados pueden enviar una propuesta.',
-                'Título': 'Abierta'
-            }, {
-                'Código': 'selective',
-                'Descripción': 'Sólo los proveedores calificados son invitados a enviar una propuesta.',
-                'Título': 'Selectiva'
-            }]
+    assert rows == [{
+        'Código': 'open',
+        'Descripción': 'Todos los proveedores interesados pueden enviar una propuesta.',
+        'Título': 'Abierta'
+    }, {
+        'Código': 'selective',
+        'Descripción': 'Sólo los proveedores calificados son invitados a enviar una propuesta.',
+        'Título': 'Selectiva'
+    }]
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
@@ -120,32 +128,68 @@ def test_translate_schema(monkeypatch, caplog):
 
             assert not os.path.exists(os.path.join(builddir, 'untranslated.json'))
 
-            assert data == {
-              "title": "Esquema para un paquete de Registros de Contrataciones Abiertas 1.1",
-              "description": "El paquete de registros contiene una lista de registros junto con algunos…",
-              "definitions": {
-                "record": {
-                  "properties": {
-                    "releases": {
-                      "title": "Entregas",
-                      "description": "Una matriz de enlaces a identificadores o entregas",
-                      "oneOf": [
-                        {
-                          "title": "Entregas vinculadas",
-                          "description": "Una lista de objetos que identifican las entregas asociadas con este Open…"
-                        },
-                        {
-                          "title": "Entregas embebidas",
-                          "description": "Una lista de entregas, con todos los datos. Las entregas DEBEN ordenarse…"
-                        }
-                      ]
-                    }
-                  }
+    assert data == {
+      "title": "Esquema para un paquete de Registros de Contrataciones Abiertas 1.1",
+      "description": "El paquete de registros contiene una lista de registros junto con algunos…",
+      "definitions": {
+        "record": {
+          "properties": {
+            "releases": {
+              "title": "Entregas",
+              "description": "Una matriz de enlaces a identificadores o entregas",
+              "oneOf": [
+                {
+                  "title": "Entregas vinculadas",
+                  "description": "Una lista de objetos que identifican las entregas asociadas con este Open…"
+                },
+                {
+                  "title": "Entregas embebidas",
+                  "description": "Una lista de entregas, con todos los datos. Las entregas DEBEN ordenarse…"
                 }
-              }
+              ]
             }
+          }
+        }
+      }
+    }
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
     assert caplog.records[0].message == 'Translating schemas to es using "schema" domain, ' \
                                         'from {} to {}'.format(sourcedir, builddir)
+
+
+def test_translate_extension_metadata(monkeypatch):
+    class Translation(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def gettext(self, *args, **kwargs):
+            return {
+                'Location': 'Ubicación',
+                'Communicates the location of proposed or executed contract delivery.': 'Comunica la ubicación de la entrega del contrato propuesto o ejecutado.',  # noqa
+            }[args[0]]
+
+    monkeypatch.setattr(gettext, 'translation', Translation)
+
+    with TemporaryDirectory() as sourcedir:
+        with open(os.path.join(sourcedir, 'extension.json'), 'w') as f:
+            f.write(extension_metadata)
+
+        with TemporaryDirectory() as builddir:
+            translate_extension_metadata('schema', sourcedir, builddir, '', 'es')
+
+            with open(os.path.join(builddir, 'extension.json')) as f:
+                data = json.load(f)
+
+    assert data == {
+        "name": {
+            "es": "Ubicación"
+        },
+        "description": {
+            "es": "Comunica la ubicación de la entrega del contrato propuesto o ejecutado."
+        },
+        "compatibility": [
+            "1.1"
+        ]
+    }

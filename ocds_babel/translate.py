@@ -6,7 +6,7 @@ import logging
 import os
 from collections import OrderedDict
 
-from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWORDS  # noqa: E501
+from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWORDS, TRANSLATABLE_EXTENSION_METADATA_KEYWORDS  # noqa: E501
 from ocds_babel.util import text_to_translate
 
 logger = logging.getLogger('ocds_babel')
@@ -73,9 +73,20 @@ def translate_schema(domain, filenames, sourcedir, builddir, localedir, language
         os.makedirs(os.path.dirname(os.path.join(builddir, name)), exist_ok=True)
 
         with open(os.path.join(sourcedir, name)) as r, open(os.path.join(builddir, name), 'w') as w:
-            data = translate_schema_from_io(r, translator, ocds_version, language)
+            data = translate_schema_from_io(r, translator, language, ocds_version)
 
             json.dump(data, w, indent=2, separators=(',', ': '), ensure_ascii=False)
+
+
+def translate_extension_metadata(domain, sourcedir, builddir, localedir, language):
+    translator = translations_instance(domain, localedir, language)
+
+    os.makedirs(builddir, exist_ok=True)
+
+    with open(os.path.join(sourcedir, 'extension.json')) as r, open(os.path.join(builddir, 'extension.json'), 'w') as w:  # noqa: E501
+        data = translate_extension_metadata_from_io(r, translator, language)
+
+        json.dump(data, w, indent=2, separators=(',', ': '), ensure_ascii=False)
 
 
 # This should roughly match the logic of `extract_codelist`.
@@ -98,7 +109,7 @@ def translate_codelist_from_io(io, translator):
 
 
 # This should roughly match the logic of `extract_schema`.
-def translate_schema_from_io(io, translator, ocds_version, language):
+def translate_schema_from_io(io, translator, language, ocds_version):
     def _translate_schema(data):
         if isinstance(data, list):
             for item in data:
@@ -113,5 +124,22 @@ def translate_schema_from_io(io, translator, ocds_version, language):
     data = json.load(io, object_pairs_hook=OrderedDict)
 
     _translate_schema(data)
+
+    return data
+
+
+# This should roughly match the logic of `extract_extension_metadata`.
+def translate_extension_metadata_from_io(io, translator, language):
+    data = json.load(io, object_pairs_hook=OrderedDict)
+
+    for key in TRANSLATABLE_EXTENSION_METADATA_KEYWORDS:
+        value = data.get(key)
+
+        if isinstance(value, dict):
+            value = value.get('en')
+
+        text = text_to_translate(value)
+        if text:
+            data[key] = {language: translator.gettext(text)}
 
     return data
