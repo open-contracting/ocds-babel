@@ -7,10 +7,7 @@ import json
 import os
 from io import StringIO
 
-TRANSLATABLE_CODELIST_HEADERS = ('Title', 'Description', 'Extension')
-TRANSLATABLE_SCHEMA_KEYWORDS = ('title', 'description')
-TRANSLATABLE_EXTENSION_METADATA_KEYWORDS = ('name', 'description')
-
+from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWORDS, TRANSLATABLE_EXTENSION_METADATA_KEYWORDS  # noqa
 
 def extract_codelist(fileobj, keywords, comment_tags, options):
     """
