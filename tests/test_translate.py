@@ -5,7 +5,7 @@ import logging
 import os
 from tempfile import TemporaryDirectory
 
-from ocds_babel.translate import translate_codelists, translate_schema
+from ocds_babel.translate import translate_codelists, translate_schemas
 
 codelist = """Code,Title,Description
 open,  Open  ,  All interested suppliers may submit a tender.  
@@ -84,7 +84,7 @@ def test_translate_codelists(monkeypatch, caplog):
                                         'from {} to {}'.format(sourcedir, builddir)
 
 
-def test_translate_schema(monkeypatch, caplog):
+def test_translate_schemas(monkeypatch, caplog):
     class Translation(object):
         def __init__(self, *args, **kwargs):
             pass
@@ -113,7 +113,7 @@ def test_translate_schema(monkeypatch, caplog):
             f.write(schema)
 
         with TemporaryDirectory() as builddir:
-            translate_schema('schema', ['record-package-schema.json'], sourcedir, builddir, '', 'es', '1.1')
+            translate_schemas('schema', ['record-package-schema.json'], sourcedir, builddir, '', 'es', '1.1')
 
             with open(os.path.join(builddir, 'record-package-schema.json')) as f:
                 data = json.load(f)
@@ -147,5 +147,5 @@ def test_translate_schema(monkeypatch, caplog):
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating schema to es using "schema" domain, ' \
+    assert caplog.records[0].message == 'Translating schemas to es using "schema" domain, ' \
                                         'from {} to {}'.format(sourcedir, builddir)

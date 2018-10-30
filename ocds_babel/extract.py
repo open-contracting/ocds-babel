@@ -7,7 +7,8 @@ import json
 import os
 from io import StringIO
 
-from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWORDS, TRANSLATABLE_EXTENSION_METADATA_KEYWORDS  # noqa
+from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWORDS, TRANSLATABLE_EXTENSION_METADATA_KEYWORDS  # noqa: E501
+
 
 def extract_codelist(fileobj, keywords, comment_tags, options):
     """
@@ -33,20 +34,20 @@ def extract_schema(fileobj, keywords, comment_tags, options):
     """
     Yields the "title" and "description" values of a JSON Schema file.
     """
-    def gather_text(data, pointer=''):
+    def _extract_schema(data, pointer=''):
         if isinstance(data, list):
             for index, item in enumerate(data):
-                yield from gather_text(item, pointer='{}/{}'.format(pointer, index))
+                yield from _extract_schema(item, pointer='{}/{}'.format(pointer, index))
         elif isinstance(data, dict):
             for key, value in data.items():
                 if key in TRANSLATABLE_SCHEMA_KEYWORDS and isinstance(value, str):
                     value = value.strip()
                     if value:
                         yield value, '{}/{}'.format(pointer, key)
-                yield from gather_text(value, pointer='{}/{}'.format(pointer, key))
+                yield from _extract_schema(value, pointer='{}/{}'.format(pointer, key))
 
     data = json.loads(fileobj.read().decode())
-    for text, pointer in gather_text(data):
+    for text, pointer in _extract_schema(data):
         yield 1, '', text, [pointer]
 
 

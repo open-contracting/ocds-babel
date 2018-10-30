@@ -11,6 +11,10 @@ from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWOR
 logger = logging.getLogger('ocds_babel')
 
 
+def translations_instance(domain, localedir, language):
+    return gettext.translation(domain, localedir, languages=[language], fallback=language == 'en')
+
+
 def translate_codelists(domain, sourcedir, builddir, localedir, language):
     """
     Writes files, translating each header and the Title, Description and Extension values of codelist CSV files.
@@ -28,30 +32,40 @@ def translate_codelists(domain, sourcedir, builddir, localedir, language):
     logger.info('Translating codelists to {} using "{}" domain, from {} to {}'.format(
         language, domain, sourcedir, builddir))
 
-    os.makedirs(builddir, exist_ok=True)
+    translator = translations_instance(domain, localedir, language)
 
-    translator = gettext.translation(domain, localedir, languages=[language], fallback=language == 'en')
+    os.makedirs(builddir, exist_ok=True)
 
     for file in glob.glob(os.path.join(sourcedir, '*.csv')):
         with open(file) as r, open(os.path.join(builddir, os.path.basename(file)), 'w') as w:
-            # This should roughly match the logic of the `extract_codelist` Babel extractor.
-            reader = csv.DictReader(r)
-            fieldnames = [translator.gettext(fieldname) for fieldname in reader.fieldnames]
+            fieldnames, rows = translate_codelist(r, translator)
 
             writer = csv.DictWriter(w, fieldnames, lineterminator='\n')
             writer.writeheader()
-
-            for row in reader:
-                new_row = {}
-                for key, value in row.items():
-                    value = value.strip()
-                    if key in TRANSLATABLE_CODELIST_HEADERS and value:
-                        value = translator.gettext(value)
-                    new_row[translator.gettext(key)] = value
-                writer.writerow(new_row)
+            writer.writerows(rows)
 
 
-def translate_schema(domain, filenames, sourcedir, builddir, localedir, language, ocds_version):
+# This should roughly match the logic of `extract_codelist`.
+def translate_codelist(io, translator):
+    reader = csv.DictReader(io)
+
+    fieldnames = [translator.gettext(fieldname) for fieldname in reader.fieldnames]
+
+    rows = []
+    for row in reader:
+        new = {}
+        for key, value in row.items():
+            if key in TRANSLATABLE_CODELIST_HEADERS and isinstance(value, str):
+                value = value.strip()
+                if value:
+                    value = translator.gettext(value)
+            new[translator.gettext(key)] = value
+        rows.append(new)
+
+    return fieldnames, rows
+
+
+def translate_schemas(domain, filenames, sourcedir, builddir, localedir, language, ocds_version):
     """
     Writes files, translating the "title" and "description" values of JSON Schema files.
 
@@ -67,29 +81,36 @@ def translate_schema(domain, filenames, sourcedir, builddir, localedir, language
     *  language: A two-letter lowercase ISO369-1 code or BCP47 language tag.
     *  ocds_version: The minor version of OCDS to substitute into URL patterns.
     """
-    logger.info('Translating schema to {} using "{}" domain, from {} to {}'.format(
+    logger.info('Translating schemas to {} using "{}" domain, from {} to {}'.format(
         language, domain, sourcedir, builddir))
+
+    translator = translations_instance(domain, localedir, language)
 
     for name in filenames:
         os.makedirs(os.path.dirname(os.path.join(builddir, name)), exist_ok=True)
 
-    # This should roughly match the logic of the `extract_schema` Babel extractor.
-    def translate_data(data):
+        with open(os.path.join(sourcedir, name)) as r, open(os.path.join(builddir, name), 'w') as w:
+            data = translate_schema(r, translator, ocds_version, language)
+
+            json.dump(data, w, indent=2, separators=(',', ': '), ensure_ascii=False)
+
+
+# This should roughly match the logic of `extract_schema`.
+def translate_schema(io, translator, ocds_version, language):
+    def _translate_schema(data):
         if isinstance(data, list):
             for item in data:
-                translate_data(item)
+                _translate_schema(item)
         elif isinstance(data, dict):
             for key, value in data.items():
-                if isinstance(value, str):
+                if key in TRANSLATABLE_SCHEMA_KEYWORDS and isinstance(value, str):
                     value = value.strip()
-                    if key in TRANSLATABLE_SCHEMA_KEYWORDS and value:
+                    if value:
                         data[key] = translator.gettext(value).replace('{{version}}', ocds_version).replace('{{lang}}', language)  # noqa: E501
-                translate_data(value)
+                _translate_schema(value)
 
-    translator = gettext.translation(domain, localedir, languages=[language], fallback=language == 'en')
+    data = json.load(io, object_pairs_hook=OrderedDict)
 
-    for name in filenames:
-        with open(os.path.join(sourcedir, name)) as r, open(os.path.join(builddir, name), 'w') as w:
-            data = json.load(r, object_pairs_hook=OrderedDict)
-            translate_data(data)
-            json.dump(data, w, indent=2, separators=(',', ': '), ensure_ascii=False)
+    _translate_schema(data)
+
+    return data
