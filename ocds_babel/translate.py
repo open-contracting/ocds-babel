@@ -46,25 +46,6 @@ def translate_codelists(domain, sourcedir, builddir, localedir, language):
             writer.writerows(rows)
 
 
-# This should roughly match the logic of `extract_codelist`.
-def translate_codelist_from_io(io, translator):
-    reader = csv.DictReader(io)
-
-    fieldnames = [translator.gettext(fieldname) for fieldname in reader.fieldnames]
-
-    rows = []
-    for row in reader:
-        data = {}
-        for key, value in row.items():
-            text = text_to_translate(value, key in TRANSLATABLE_CODELIST_HEADERS)
-            if text:
-                value = translator.gettext(text)
-            data[translator.gettext(key)] = value
-        rows.append(data)
-
-    return fieldnames, rows
-
-
 def translate_schema(domain, filenames, sourcedir, builddir, localedir, language, ocds_version):
     """
     Writes files, translating the "title" and "description" values of JSON Schema files.
@@ -95,6 +76,25 @@ def translate_schema(domain, filenames, sourcedir, builddir, localedir, language
             data = translate_schema_from_io(r, translator, ocds_version, language)
 
             json.dump(data, w, indent=2, separators=(',', ': '), ensure_ascii=False)
+
+
+# This should roughly match the logic of `extract_codelist`.
+def translate_codelist_from_io(io, translator):
+    reader = csv.DictReader(io)
+
+    fieldnames = [translator.gettext(fieldname) for fieldname in reader.fieldnames]
+
+    rows = []
+    for row in reader:
+        data = {}
+        for key, value in row.items():
+            text = text_to_translate(value, key in TRANSLATABLE_CODELIST_HEADERS)
+            if text:
+                value = translator.gettext(text)
+            data[translator.gettext(key)] = value
+        rows.append(data)
+
+    return fieldnames, rows
 
 
 # This should roughly match the logic of `extract_schema`.
