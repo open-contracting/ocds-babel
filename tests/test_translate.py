@@ -13,7 +13,7 @@ selective,  Selective  ,  Only qualified suppliers are invited to submit a tende
 """  # noqa
 
 schema = """{
-  "title": "Schema for an Open Contracting Record package {{version}}",
+  "title": "Schema for an Open Contracting Record package {{version}} [{{lang}}]",
   "description": "The record package contains a list of records along with some publishing…",
   "definitions": {
     "record": {
@@ -99,7 +99,7 @@ def test_translate_schema(monkeypatch, caplog):
 
         def gettext(self, *args, **kwargs):
             return {
-                'Schema for an Open Contracting Record package {{version}}': 'Esquema para un paquete de Registros de Contrataciones Abiertas {{version}}',  # noqa
+                'Schema for an Open Contracting Record package {{version}} [{{lang}}]': 'Esquema para un paquete de Registros de Contrataciones Abiertas {{version}} [{{lang}}]',  # noqa
                 'The record package contains a list of records along with some publishing…':  'El paquete de registros contiene una lista de registros junto con algunos…',  # noqa
                 'Releases': 'Entregas',
                 'An array of linking identifiers or releases': 'Una matriz de enlaces a identificadores o entregas',
@@ -121,7 +121,7 @@ def test_translate_schema(monkeypatch, caplog):
             f.write(schema)
 
         with TemporaryDirectory() as builddir:
-            translate_schema('schema', ['record-package-schema.json'], sourcedir, builddir, '', 'es', '1.1')
+            translate_schema('schema', ['record-package-schema.json'], sourcedir, builddir, '', 'es', version='1.1')
 
             with open(os.path.join(builddir, 'record-package-schema.json')) as f:
                 data = json.load(f)
@@ -129,7 +129,7 @@ def test_translate_schema(monkeypatch, caplog):
             assert not os.path.exists(os.path.join(builddir, 'untranslated.json'))
 
     assert data == {
-      "title": "Esquema para un paquete de Registros de Contrataciones Abiertas 1.1",
+      "title": "Esquema para un paquete de Registros de Contrataciones Abiertas 1.1 [es]",
       "description": "El paquete de registros contiene una lista de registros junto con algunos…",
       "definitions": {
         "record": {

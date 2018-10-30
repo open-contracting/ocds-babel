@@ -46,11 +46,11 @@ def translate_codelists(domain, sourcedir, builddir, localedir, language):
             writer.writerows(rows)
 
 
-def translate_schema(domain, filenames, sourcedir, builddir, localedir, language, ocds_version):
+def translate_schema(domain, filenames, sourcedir, builddir, localedir, language, **kwargs):
     """
     Writes files, translating the "title" and "description" values of JSON Schema files.
 
-    Also substitutes `{{version}}` and `{{lang}}` with the given OCDS version and language code.
+    In translated strings, replaces `{{lang}}` with the language code. Keyword arguments specify more replacements.
 
     These files are typically referenced by `jsonschema` directives.
 
@@ -62,7 +62,6 @@ def translate_schema(domain, filenames, sourcedir, builddir, localedir, language
     *  builddir: The path to the build directory.
     *  localedir: The path to the `locale` directory.
     *  language: A two-letter lowercase ISO369-1 code or BCP47 language tag.
-    *  ocds_version: The minor version of OCDS to substitute into URL patterns.
     """
     logger.info('Translating schemas to {} using "{}" domain, from {} to {}'.format(
         language, domain, sourcedir, builddir))
@@ -73,7 +72,7 @@ def translate_schema(domain, filenames, sourcedir, builddir, localedir, language
         os.makedirs(os.path.dirname(os.path.join(builddir, name)), exist_ok=True)
 
         with open(os.path.join(sourcedir, name)) as r, open(os.path.join(builddir, name), 'w') as w:
-            data = translate_schema_from_io(r, translator, language, ocds_version)
+            data = translate_schema_from_io(r, translator, dict(lang=language, **kwargs))
 
             json.dump(data, w, indent=2, separators=(',', ': '), ensure_ascii=False)
 
@@ -109,7 +108,7 @@ def translate_codelist_from_io(io, translator):
 
 
 # This should roughly match the logic of `extract_schema`.
-def translate_schema_from_io(io, translator, language, ocds_version):
+def translate_schema_from_io(io, translator, replacements={}):
     def _translate_schema(data):
         if isinstance(data, list):
             for item in data:
@@ -119,7 +118,9 @@ def translate_schema_from_io(io, translator, language, ocds_version):
                 _translate_schema(value)
                 text = text_to_translate(value, key in TRANSLATABLE_SCHEMA_KEYWORDS)
                 if text:
-                    data[key] = translator.gettext(text).replace('{{version}}', ocds_version).replace('{{lang}}', language)  # noqa: E501
+                    data[key] = translator.gettext(text)
+                    for old, new in replacements.items():
+                        data[key] = data[key].replace('{{' + old + '}}', new)
 
     data = json.load(io, object_pairs_hook=OrderedDict)
 
