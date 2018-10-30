@@ -8,6 +8,7 @@ import os
 from io import StringIO
 
 from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWORDS, TRANSLATABLE_EXTENSION_METADATA_KEYWORDS  # noqa: E501
+from ocds_babel.util import text_to_translate
 
 
 def extract_codelist(fileobj, keywords, comment_tags, options):
@@ -17,17 +18,16 @@ def extract_codelist(fileobj, keywords, comment_tags, options):
 
     # standard-maintenance-scripts validates the headers of codelist CSV files.
     reader = csv.DictReader(StringIO(fileobj.read().decode()))
-    for header in reader.fieldnames:
-        yield 0, '', header, ''
+    for fieldname in reader.fieldnames:
+        yield 0, '', fieldname, ''
 
     # Don't translate the titles of the hundreds of currencies.
     if os.path.basename(fileobj.name) != 'currency.csv':
         for lineno, row in enumerate(reader, 1):
             for key, value in row.items():
-                if key in TRANSLATABLE_CODELIST_HEADERS and isinstance(value, str):
-                    value = value.strip()
-                    if value:
-                        yield lineno, '', value, [key]
+                text = text_to_translate(value, key in TRANSLATABLE_CODELIST_HEADERS)
+                if text:
+                    yield lineno, '', text, [key]
 
 
 def extract_schema(fileobj, keywords, comment_tags, options):
@@ -40,11 +40,10 @@ def extract_schema(fileobj, keywords, comment_tags, options):
                 yield from _extract_schema(item, pointer='{}/{}'.format(pointer, index))
         elif isinstance(data, dict):
             for key, value in data.items():
-                if key in TRANSLATABLE_SCHEMA_KEYWORDS and isinstance(value, str):
-                    value = value.strip()
-                    if value:
-                        yield value, '{}/{}'.format(pointer, key)
                 yield from _extract_schema(value, pointer='{}/{}'.format(pointer, key))
+                text = text_to_translate(value, key in TRANSLATABLE_SCHEMA_KEYWORDS)
+                if text:
+                    yield text, '{}/{}'.format(pointer, key)
 
     data = json.loads(fileobj.read().decode())
     for text, pointer in _extract_schema(data):
@@ -57,15 +56,15 @@ def extract_extension_metadata(fileobj, keywords, comment_tags, options):
     """
     data = json.loads(fileobj.read().decode())
     for key in TRANSLATABLE_EXTENSION_METADATA_KEYWORDS:
-        comment = '/' + key
-        value = data.get(key, {})
+        value = data.get(key)
 
-        # Add language map.
         if isinstance(value, dict):
-            comment += '/en'
+            comment = '/{}/en'.format(key)
+            value = value.get('en')
         else:
-            value = {'en': value}
+            # old extension.json format
+            comment = '/{}'.format(key)
 
-        value = value.get('en', '').strip()
-        if value:
-            yield 1, '', value, [comment]
+        text = text_to_translate(value)
+        if text:
+            yield 1, '', text, [comment]
