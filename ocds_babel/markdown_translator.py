@@ -85,7 +85,14 @@ class MarkdownTranslator(nodes.NodeVisitor):
 
     def visit_literal_block(self, node):
         self.append('```{}\n'.format(node.attributes.get('language', '')))
-        self.append(node.rawsource)
+        # Markdown code blocks (indented paragraphs) have no `rawsource`, but fenced code blocks do.
+        if node.rawsource:
+            text = node.rawsource
+        else:
+            text = node.astext()
+            if not text.endswith('\n'):
+                text += '\n'
+        self.append(text)
 
     def depart_literal_block(self, node):
         self.append('```\n\n')

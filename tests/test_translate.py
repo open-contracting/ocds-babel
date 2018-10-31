@@ -87,7 +87,7 @@ Literal block
 * Bulleted list item 2
 
 1. Enumerated list item 1
-2. Enumerated list item 1
+2. Enumerated list item 2
 """
 
 
@@ -264,8 +264,6 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Heading 2': 'Titre 2',
                 'Paragraph text': 'Texte de paragraphe',
                 'Blockquote text': 'Texte de citation',
-                'Raw paragraph text': 'Texte de paragraphe brut',
-                'Literal block': 'Bloc littéral',
                 'Bulleted list item 1': 'Élément de liste à puces 1',
                 'Bulleted list item 2': 'Élément de liste à puces 2',
                 'Enumerated list item 1': 'Élément de liste énumérée 1',
@@ -298,10 +296,12 @@ Texte de paragraphe
 
 > Texte de citation
 
-    Texte de paragraphe brut
-
 ```
-Bloc littéral
+Raw paragraph text
+```
+
+```none
+Literal block
 ```
 
 ```json
@@ -319,9 +319,9 @@ Bloc littéral
 * Élément de liste à puces 2
 
 1. Élément de liste énumérée 1
-2. Élément de liste énumérée 2
+1. Élément de liste énumérée 2
 """
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating to es using "docs" domain, into {}'.format(builddir)
+    assert caplog.records[0].message == 'Translating to fr using "docs" domain, into {}'.format(builddir)
