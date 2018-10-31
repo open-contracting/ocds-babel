@@ -15,6 +15,7 @@ setup(
     long_description=long_description,
     install_requires=[
         'Babel',
+        'docutils',
     ],
     extras_require={
         'test': [

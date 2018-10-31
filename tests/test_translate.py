@@ -46,6 +46,28 @@ extension_metadata = """{
   ]
 }"""
 
+extension_readme = """# Bid statistics and details
+
+## Metadata
+
+To use this extension, include its URL in the `extension` array of your release or record package.
+
+```json
+{
+    "extensions": ["https://raw.githubusercontent.com/open-contracting/ocds_bid_extension/v1.1.3/extension.json"],
+    "releases": []
+}
+```
+
+## Documentation
+
+```eval_rst
+.. extensiontable::
+   :extension: bids
+   :definitions: BidsStatistic
+```
+"""
+
 
 def test_translate_codelists(monkeypatch, caplog):
     class Translation(object):
@@ -204,3 +226,61 @@ def test_translate_extension_metadata(monkeypatch, caplog):
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
     assert caplog.records[0].message == 'Translating to es using "schema" domain, into {}'.format(builddir)
+
+
+def test_translate_markdown(monkeypatch, caplog):
+    class Translation(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def gettext(self, *args, **kwargs):
+            return {
+            'Bid statistics and details': 'Estadísticas y detalles de las ofertas',
+            'Metadata': 'Metadatos',
+            'To use this extension, include its URL in the `extension` array of your release or record package.': 'Para usar esta extensión, incluya su URL en la lista `extension` de su entrega o paquete de registro.',  # noqa
+            'Documentation': 'Documentación',
+            # docutils ... optparse
+            '%prog [options]': '%prog [options]',
+            }[args[0]]
+
+    monkeypatch.setattr(gettext, 'translation', Translation)
+
+    caplog.set_level(logging.INFO)
+
+    with TemporaryDirectory() as sourcedir:
+        with open(os.path.join(sourcedir, 'README.md'), 'w') as f:
+            f.write(extension_readme)
+
+        with TemporaryDirectory() as builddir:
+            translate([
+                ([os.path.join(sourcedir, 'README.md')], builddir, 'docs'),
+            ], '', 'es')
+
+            with open(os.path.join(builddir, 'README.md')) as f:
+                text = f.read()
+
+    assert text == """# Estadísticas y detalles de las ofertas
+
+## Metadatos
+
+Para usar esta extensión, incluya su URL en la lista `extension` de su entrega o paquete de registro.
+
+```json
+{
+    "extensions": ["https://raw.githubusercontent.com/open-contracting/ocds_bid_extension/v1.1.3/extension.json"],
+    "releases": []
+}
+```
+
+## Documentación
+
+```eval_rst
+.. extensiontable::
+   :extension: bids
+   :definitions: BidsStatistic
+```
+"""
+
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'INFO'
+    assert caplog.records[0].message == 'Translating to es using "docs" domain, into {}'.format(builddir)
