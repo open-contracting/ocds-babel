@@ -62,7 +62,9 @@ extension_readme = """# Heading 1
 
 ## Heading 2
 
-Paragraph text
+Paragraph text and `literal text`
+
+`Literal text`
 
 > Blockquote text
 
@@ -82,6 +84,8 @@ Literal block
 .. extensiontable::
    :extension: location
 ```
+
+<h3>Subheading</h3>
 
 * Bulleted list item 1
 * Bulleted list item 2
@@ -262,7 +266,8 @@ def test_translate_markdown(monkeypatch, caplog):
             return {
                 'Heading 1': 'Titre 1',
                 'Heading 2': 'Titre 2',
-                'Paragraph text': 'Texte de paragraphe',
+                'Paragraph text and `literal text`': 'Texte de paragraphe et `texte littéral`',
+                '`Literal text`': '`Texte littéral`',
                 'Blockquote text': 'Texte de citation',
                 'Bulleted list item 1': 'Élément de liste à puces 1',
                 'Bulleted list item 2': 'Élément de liste à puces 2',
@@ -292,7 +297,9 @@ def test_translate_markdown(monkeypatch, caplog):
 
 ## Titre 2
 
-Texte de paragraphe
+Texte de paragraphe et `texte littéral`
+
+`Texte littéral`
 
 > Texte de citation
 
@@ -314,6 +321,8 @@ Literal block
 .. extensiontable::
    :extension: location
 ```
+
+<h3>Subheading</h3>
 
 * Élément de liste à puces 1
 * Élément de liste à puces 2
