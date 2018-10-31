@@ -1,6 +1,5 @@
 import csv
 import gettext
-import glob
 import json
 import logging
 import os
@@ -13,76 +12,38 @@ from ocds_babel.util import text_to_translate
 logger = logging.getLogger('ocds_babel')
 
 
-def translations_instance(domain, localedir, language):
-    return gettext.translation(domain, localedir, languages=[language], fallback=language == 'en')
-
-
-def translate_codelists(domain, sourcedir, builddir, localedir, language):
+def translate(configuration, localedir, language, **kwargs):
     """
-    Writes files, translating each header and the Title, Description and Extension values of codelist CSV files.
+    Writes files, translating any translatable strings.
 
-    These files are typically referenced by `csv-table-no-translate` directives.
-
-    Args:
-
-    * domain: The gettext domain.
-    * sourcedir: The path to the directory containing the codelist CSV files.
-    * builddir: The path to the build directory.
-    * localedir: The path to the `locale` directory.
-    * language: A two-letter lowercase ISO369-1 code or BCP47 language tag.
+    For translated strings in schema files, replaces `{{lang}}` with the language code. Keyword arguments may specify
+    additional replacements.
     """
-    logger.info('Translating codelists to {} using "{}" domain, from {} to {}'.format(
-        language, domain, sourcedir, builddir))
+    for sources, target, domain in configuration:
+        logger.info('Translating to {} using "{}" domain, into {}'.format(language, domain, target))
 
-    translator = translations_instance(domain, localedir, language)
+        translator = gettext.translation(domain, localedir, languages=[language], fallback=language == 'en')
 
-    os.makedirs(builddir, exist_ok=True)
+        os.makedirs(target, exist_ok=True)
 
-    for file in glob.glob(os.path.join(sourcedir, '*.csv')):
-        with open(file) as r, open(os.path.join(builddir, os.path.basename(file)), 'w') as w:
-            w.write(translate_codelist_from_io(r, translator))
-
-
-def translate_schema(domain, filenames, sourcedir, builddir, localedir, language, **kwargs):
-    """
-    Writes files, translating the "title" and "description" values of JSON Schema files.
-
-    In translated strings, replaces `{{lang}}` with the language code. Keyword arguments specify more replacements.
-
-    These files are typically referenced by `jsonschema` directives.
-
-    Args:
-
-    *  domain: The gettext domain.
-    *  filenames: A list of JSON Schema filenames to translate.
-    *  sourcedir: The path to the directory containing the JSON Schema files.
-    *  builddir: The path to the build directory.
-    *  localedir: The path to the `locale` directory.
-    *  language: A two-letter lowercase ISO369-1 code or BCP47 language tag.
-    """
-    logger.info('Translating schemas to {} using "{}" domain, from {} to {}'.format(
-        language, domain, sourcedir, builddir))
-
-    translator = translations_instance(domain, localedir, language)
-
-    for name in filenames:
-        os.makedirs(os.path.dirname(os.path.join(builddir, name)), exist_ok=True)
-
-        with open(os.path.join(sourcedir, name)) as r, open(os.path.join(builddir, name), 'w') as w:
-            w.write(translate_schema_from_io(r, translator, dict(lang=language, **kwargs)))
-
-
-def translate_extension_metadata(domain, sourcedir, builddir, localedir, language):
-    translator = translations_instance(domain, localedir, language)
-
-    os.makedirs(builddir, exist_ok=True)
-
-    with open(os.path.join(sourcedir, 'extension.json')) as r, open(os.path.join(builddir, 'extension.json'), 'w') as w:  # noqa: E501
-        w.write(translate_extension_metadata_from_io(r, translator, language))
+        for source in sources:
+            basename = os.path.basename(source)
+            with open(source) as r, open(os.path.join(target, basename), 'w') as w:
+                if source.endswith('.csv'):
+                    method = translate_codelist
+                elif source.endswith('-schema.json'):
+                    method = translate_schema
+                    kwargs = dict(lang=language, **kwargs)
+                elif basename == 'extension.json':
+                    method = translate_extension_metadata
+                    kwargs = dict(lang=language, **kwargs)
+                else:
+                    raise NotImplementedError(basename)
+                w.write(method(r, translator, **kwargs))
 
 
 # This should roughly match the logic of `extract_codelist`.
-def translate_codelist_from_io(io, translator):
+def translate_codelist(io, translator):
     reader = csv.DictReader(io)
 
     fieldnames = [translator.gettext(fieldname) for fieldname in reader.fieldnames]
@@ -106,7 +67,7 @@ def translate_codelist_from_io(io, translator):
 
 
 # This should roughly match the logic of `extract_schema`.
-def translate_schema_from_io(io, translator, replacements={}):
+def translate_schema(io, translator, **kwargs):
     def _translate_schema(data):
         if isinstance(data, list):
             for item in data:
@@ -117,7 +78,7 @@ def translate_schema_from_io(io, translator, replacements={}):
                 text = text_to_translate(value, key in TRANSLATABLE_SCHEMA_KEYWORDS)
                 if text:
                     data[key] = translator.gettext(text)
-                    for old, new in replacements.items():
+                    for old, new in kwargs.items():
                         data[key] = data[key].replace('{{' + old + '}}', new)
 
     data = json.load(io, object_pairs_hook=OrderedDict)
@@ -128,7 +89,7 @@ def translate_schema_from_io(io, translator, replacements={}):
 
 
 # This should roughly match the logic of `extract_extension_metadata`.
-def translate_extension_metadata_from_io(io, translator, language='en'):
+def translate_extension_metadata(io, translator, lang='en'):
     data = json.load(io, object_pairs_hook=OrderedDict)
 
     for key in TRANSLATABLE_EXTENSION_METADATA_KEYWORDS:
@@ -139,6 +100,6 @@ def translate_extension_metadata_from_io(io, translator, language='en'):
 
         text = text_to_translate(value)
         if text:
-            data[key] = {language: translator.gettext(text)}
+            data[key] = {lang: translator.gettext(text)}
 
     return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)

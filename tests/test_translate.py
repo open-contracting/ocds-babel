@@ -3,9 +3,10 @@ import gettext
 import json
 import logging
 import os
+from glob import glob
 from tempfile import TemporaryDirectory
 
-from ocds_babel.translate import translate_codelists, translate_schema, translate_extension_metadata
+from ocds_babel.translate import translate
 
 codelist = """Code,Title,Description
 open,  Open  ,  All interested suppliers may submit a tender.  
@@ -71,7 +72,9 @@ def test_translate_codelists(monkeypatch, caplog):
             f.write(codelist)
 
         with TemporaryDirectory() as builddir:
-            translate_codelists('codelists', sourcedir, builddir, '', 'es')
+            translate([
+                (glob(os.path.join(sourcedir, '*.csv')), builddir, 'codelists'),
+            ], '', 'es')
 
             with open(os.path.join(builddir, 'method.csv')) as f:
                 rows = [dict(row) for row in csv.DictReader(f)]
@@ -88,8 +91,7 @@ def test_translate_codelists(monkeypatch, caplog):
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating codelists to es using "codelists" domain, ' \
-                                        'from {} to {}'.format(sourcedir, builddir)
+    assert caplog.records[0].message == 'Translating to es using "codelists" domain, into {}'.format(builddir)
 
 
 def test_translate_schema(monkeypatch, caplog):
@@ -121,7 +123,9 @@ def test_translate_schema(monkeypatch, caplog):
             f.write(schema)
 
         with TemporaryDirectory() as builddir:
-            translate_schema('schema', ['record-package-schema.json'], sourcedir, builddir, '', 'es', version='1.1')
+            translate([
+                ([os.path.join(sourcedir, 'record-package-schema.json')], builddir, 'schema'),
+            ], '', 'es', version='1.1')
 
             with open(os.path.join(builddir, 'record-package-schema.json')) as f:
                 data = json.load(f)
@@ -155,11 +159,10 @@ def test_translate_schema(monkeypatch, caplog):
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating schemas to es using "schema" domain, ' \
-                                        'from {} to {}'.format(sourcedir, builddir)
+    assert caplog.records[0].message == 'Translating to es using "schema" domain, into {}'.format(builddir)
 
 
-def test_translate_extension_metadata(monkeypatch):
+def test_translate_extension_metadata(monkeypatch, caplog):
     class Translation(object):
         def __init__(self, *args, **kwargs):
             pass
@@ -172,12 +175,16 @@ def test_translate_extension_metadata(monkeypatch):
 
     monkeypatch.setattr(gettext, 'translation', Translation)
 
+    caplog.set_level(logging.INFO)
+
     with TemporaryDirectory() as sourcedir:
         with open(os.path.join(sourcedir, 'extension.json'), 'w') as f:
             f.write(extension_metadata)
 
         with TemporaryDirectory() as builddir:
-            translate_extension_metadata('schema', sourcedir, builddir, '', 'es')
+            translate([
+                ([os.path.join(sourcedir, 'extension.json')], builddir, 'schema'),
+            ], '', 'es')
 
             with open(os.path.join(builddir, 'extension.json')) as f:
                 data = json.load(f)
@@ -193,3 +200,7 @@ def test_translate_extension_metadata(monkeypatch):
             "1.1"
         ]
     }
+
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'INFO'
+    assert caplog.records[0].message == 'Translating to es using "schema" domain, into {}'.format(builddir)
