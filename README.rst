@@ -42,7 +42,7 @@ In the Sphinx build configuration file (``conf.py``), you can use :code:`transla
             (glob(str(basedir / 'schema' / 'codelists')), basedir / 'build' / language, 'codelists'),
         ], localedir, language)
 
-The arguments to :code:`translate` are:
+:code:`translate` automatically determines the translation method to used based on filenames. The arguments to :code:`translate` are:
 
 #. A list of tuples. Each tuple has three values:
 
@@ -52,9 +52,7 @@ The arguments to :code:`translate` are:
 
 #. Locale directory (the path of the directory containing message catalog files)
 #. Target language (the code of the language to translate to)
-#. Optional keyword arguments to replace ``{{marker}}`` markers with values, e.g. :code:`version='1.1'`.
-
-:code:`translate` automatically determines the translation method to used based on filenames.
+#. Optional keyword arguments to replace ``{{marker}}`` markers with values, e.g. :code:`version='1.1'`
 
 Methods are also available for translating ``extension.json`` and for translating Markdown-to-Markdown.
 

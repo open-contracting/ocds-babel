@@ -46,26 +46,52 @@ extension_metadata = """{
   ]
 }"""
 
-extension_readme = """# Bid statistics and details
+extension_metadata_language_map = """{
+  "name": {
+    "en": "  Location  "
+  },
+  "description": {
+    "en": "  Communicates the location of proposed or executed contract delivery.  "
+  },
+  "compatibility": [
+    "1.1"
+  ]
+}"""
 
-## Metadata
+extension_readme = """# Heading 1
 
-To use this extension, include its URL in the `extension` array of your release or record package.
+## Heading 2
+
+Paragraph text and `literal text`
+
+`Literal text`
+
+> Blockquote text
+
+    Raw paragraph text
+
+```
+Literal block
+```
 
 ```json
 {
-    "extensions": ["https://raw.githubusercontent.com/open-contracting/ocds_bid_extension/v1.1.3/extension.json"],
-    "releases": []
+    "json": "block"
 }
 ```
 
-## Documentation
-
 ```eval_rst
 .. extensiontable::
-   :extension: bids
-   :definitions: BidsStatistic
+   :extension: location
 ```
+
+<h3>Subheading</h3>
+
+* Bulleted list item 1
+* Bulleted list item 2
+
+1. Enumerated list item 1
+2. Enumerated list item 2
 """
 
 
@@ -185,47 +211,50 @@ def test_translate_schema(monkeypatch, caplog):
 
 
 def test_translate_extension_metadata(monkeypatch, caplog):
-    class Translation(object):
-        def __init__(self, *args, **kwargs):
-            pass
+    for metadata in (extension_metadata, extension_metadata_language_map):
+        class Translation(object):
+            def __init__(self, *args, **kwargs):
+                pass
 
-        def gettext(self, *args, **kwargs):
-            return {
-                'Location': 'Ubicación',
-                'Communicates the location of proposed or executed contract delivery.': 'Comunica la ubicación de la entrega del contrato propuesto o ejecutado.',  # noqa
-            }[args[0]]
+            def gettext(self, *args, **kwargs):
+                return {
+                    'Location': 'Ubicación',
+                    'Communicates the location of proposed or executed contract delivery.': 'Comunica la ubicación de la entrega del contrato propuesto o ejecutado.',  # noqa
+                }[args[0]]
 
-    monkeypatch.setattr(gettext, 'translation', Translation)
+        monkeypatch.setattr(gettext, 'translation', Translation)
 
-    caplog.set_level(logging.INFO)
+        caplog.set_level(logging.INFO)
 
-    with TemporaryDirectory() as sourcedir:
-        with open(os.path.join(sourcedir, 'extension.json'), 'w') as f:
-            f.write(extension_metadata)
+        with TemporaryDirectory() as sourcedir:
+            with open(os.path.join(sourcedir, 'extension.json'), 'w') as f:
+                f.write(metadata)
 
-        with TemporaryDirectory() as builddir:
-            translate([
-                ([os.path.join(sourcedir, 'extension.json')], builddir, 'schema'),
-            ], '', 'es')
+            with TemporaryDirectory() as builddir:
+                translate([
+                    ([os.path.join(sourcedir, 'extension.json')], builddir, 'schema'),
+                ], '', 'es')
 
-            with open(os.path.join(builddir, 'extension.json')) as f:
-                data = json.load(f)
+                with open(os.path.join(builddir, 'extension.json')) as f:
+                    data = json.load(f)
 
-    assert data == {
-        "name": {
-            "es": "Ubicación"
-        },
-        "description": {
-            "es": "Comunica la ubicación de la entrega del contrato propuesto o ejecutado."
-        },
-        "compatibility": [
-            "1.1"
-        ]
-    }
+        assert data == {
+            "name": {
+                "es": "Ubicación"
+            },
+            "description": {
+                "es": "Comunica la ubicación de la entrega del contrato propuesto o ejecutado."
+            },
+            "compatibility": [
+                "1.1"
+            ]
+        }
 
-    assert len(caplog.records) == 1
-    assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating to es using "schema" domain, into {}'.format(builddir)
+        assert len(caplog.records) == 1
+        assert caplog.records[0].levelname == 'INFO'
+        assert caplog.records[0].message == 'Translating to es using "schema" domain, into {}'.format(builddir)
+
+        caplog.clear()
 
 
 def test_translate_markdown(monkeypatch, caplog):
@@ -235,12 +264,17 @@ def test_translate_markdown(monkeypatch, caplog):
 
         def gettext(self, *args, **kwargs):
             return {
-            'Bid statistics and details': 'Estadísticas y detalles de las ofertas',
-            'Metadata': 'Metadatos',
-            'To use this extension, include its URL in the `extension` array of your release or record package.': 'Para usar esta extensión, incluya su URL en la lista `extension` de su entrega o paquete de registro.',  # noqa
-            'Documentation': 'Documentación',
-            # docutils ... optparse
-            '%prog [options]': '%prog [options]',
+                'Heading 1': 'Titre 1',
+                'Heading 2': 'Titre 2',
+                'Paragraph text and `literal text`': 'Texte de paragraphe et `texte littéral`',
+                '`Literal text`': '`Texte littéral`',
+                'Blockquote text': 'Texte de citation',
+                'Bulleted list item 1': 'Élément de liste à puces 1',
+                'Bulleted list item 2': 'Élément de liste à puces 2',
+                'Enumerated list item 1': 'Élément de liste énumérée 1',
+                'Enumerated list item 2': 'Élément de liste énumérée 2',
+                # docutils ... optparse
+                '%prog [options]': '%prog [options]',
             }[args[0]]
 
     monkeypatch.setattr(gettext, 'translation', Translation)
@@ -254,33 +288,49 @@ def test_translate_markdown(monkeypatch, caplog):
         with TemporaryDirectory() as builddir:
             translate([
                 ([os.path.join(sourcedir, 'README.md')], builddir, 'docs'),
-            ], '', 'es')
+            ], '', 'fr')
 
             with open(os.path.join(builddir, 'README.md')) as f:
                 text = f.read()
 
-    assert text == """# Estadísticas y detalles de las ofertas
+    assert text == """# Titre 1
 
-## Metadatos
+## Titre 2
 
-Para usar esta extensión, incluya su URL en la lista `extension` de su entrega o paquete de registro.
+Texte de paragraphe et `texte littéral`
+
+`Texte littéral`
+
+> Texte de citation
+
+```
+Raw paragraph text
+```
+
+```none
+Literal block
+```
 
 ```json
 {
-    "extensions": ["https://raw.githubusercontent.com/open-contracting/ocds_bid_extension/v1.1.3/extension.json"],
-    "releases": []
+    "json": "block"
 }
 ```
 
-## Documentación
-
 ```eval_rst
 .. extensiontable::
-   :extension: bids
-   :definitions: BidsStatistic
+   :extension: location
 ```
+
+<h3>Subheading</h3>
+
+* Élément de liste à puces 1
+* Élément de liste à puces 2
+
+1. Élément de liste énumérée 1
+1. Élément de liste énumérée 2
 """
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating to es using "docs" domain, into {}'.format(builddir)
+    assert caplog.records[0].message == 'Translating to fr using "docs" domain, into {}'.format(builddir)

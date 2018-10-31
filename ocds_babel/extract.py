@@ -1,7 +1,3 @@
-"""
-`Babel extractors <http://babel.pocoo.org/en/latest/messages.html>`__ for codelist CSV files and JSON Schema files.
-"""
-
 import csv
 import json
 import os

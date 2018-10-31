@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3
+
+* Fix bug in parsing of Markdown code block.
+
 ## 0.0.2 (2018-10-31)
 
 * Fix bug if `lang` keyword argument is already specified.
