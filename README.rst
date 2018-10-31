@@ -38,8 +38,8 @@ In the Sphinx build configuration file (``conf.py``), you can use :code:`transla
         language = app.config.overrides.get('language', 'en')
 
         translate([
-            ([], basedir / 'build' / language, 'schema'),
-            ([], basedir / 'build' / language, 'codelists'),
+            (glob(str(basedir / 'schema' / '*-schema.json')), basedir / 'build' / language, 'schema'),
+            (glob(str(basedir / 'schema' / 'codelists')), basedir / 'build' / language, 'codelists'),
         ], localedir, language)
 
 The arguments to :code:`translate` are:
