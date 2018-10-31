@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = OCDSDocumentationSupport
+SPHINXPROJ    = OCDSBabel
 SOURCEDIR     = .
 BUILDDIR      = _build
 
