@@ -9,7 +9,7 @@ setup(
     author='Open Contracting Partnership',
     author_email='data@open-contracting.org',
     url='https://github.com/open-contracting/ocds-babel',
-    description='',
+    description='Provides Babel extractors and translation methods for OCDS documentation',
     license='BSD',
     packages=find_packages(),
     long_description=long_description,
