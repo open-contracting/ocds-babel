@@ -41,12 +41,12 @@ def translate(configuration, localedir, language, **kwargs):
                     method = translate_codelist
                 elif source.endswith('-schema.json'):
                     method = translate_schema
-                    kwargs = dict(lang=language, **kwargs)
+                    kwargs.update(lang=language)
                 elif source.endswith('.md'):
                     method = translate_markdown
                 elif basename == 'extension.json':
                     method = translate_extension_metadata
-                    kwargs = dict(lang=language, **kwargs)
+                    kwargs.update(lang=language)
                 else:
                     raise NotImplementedError(basename)
                 w.write(method(r, translators[domain], **kwargs))
