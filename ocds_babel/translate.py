@@ -23,10 +23,14 @@ def translate(configuration, localedir, language, **kwargs):
     For translated strings in schema files, replaces `{{lang}}` with the language code. Keyword arguments may specify
     additional replacements.
     """
+    translators = {}
+
     for sources, target, domain in configuration:
         logger.info('Translating to {} using "{}" domain, into {}'.format(language, domain, target))
 
-        translator = gettext.translation(domain, localedir, languages=[language], fallback=language == 'en')
+        if domain not in translators:
+            translators[domain] = gettext.translation(
+                domain, localedir, languages=[language], fallback=language == 'en')
 
         os.makedirs(target, exist_ok=True)
 
@@ -45,7 +49,7 @@ def translate(configuration, localedir, language, **kwargs):
                     kwargs = dict(lang=language, **kwargs)
                 else:
                     raise NotImplementedError(basename)
-                w.write(method(r, translator, **kwargs))
+                w.write(method(r, translators[domain], **kwargs))
 
 
 # This should roughly match the logic of `extract_codelist`.
