@@ -1,8 +1,10 @@
 # Changelog
 
-## 0.0.3
+## 0.0.3 (2018-11-02)
 
+* Use universal newlines mode, to avoid CSV parsing errors.
 * Fix bug in parsing of Markdown code block.
+* Fix warning if CSV field name is empty.
 
 ## 0.0.2 (2018-10-31)
 

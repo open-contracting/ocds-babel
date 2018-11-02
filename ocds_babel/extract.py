@@ -13,9 +13,11 @@ def extract_codelist(fileobj, keywords, comment_tags, options):
     """
 
     # standard-maintenance-scripts validates the headers of codelist CSV files.
-    reader = csv.DictReader(StringIO(fileobj.read().decode()))
+    # Use universal newlines mode, to avoid parsing errors.
+    reader = csv.DictReader(StringIO(fileobj.read().decode(), newline=''))
     for fieldname in reader.fieldnames:
-        yield 0, '', fieldname, ''
+        if fieldname:
+            yield 0, '', fieldname, ''
 
     # Don't translate the titles of the hundreds of currencies.
     if os.path.basename(fileobj.name) != 'currency.csv':

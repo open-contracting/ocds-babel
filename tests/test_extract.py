@@ -80,6 +80,18 @@ def test_extract_codelist_currency():
     ])
 
 
+def test_extract_codelist_fieldname():
+    assert_result('test.csv', b'Code,', extract_codelist, [
+        (0, '', 'Code', ''),
+    ])
+
+
+def test_extract_codelist_newline():
+    assert_result('test.csv', b'Code\rfoo', extract_codelist, [
+        (0, '', 'Code', ''),
+    ])
+
+
 def test_extract_schema():
     assert_result('schema.json', schema, extract_schema, [
         (1, '', 'foo', ['/title/oneOf/0/title']),
