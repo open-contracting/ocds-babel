@@ -92,6 +92,16 @@ Literal block
 
 1. Enumerated list item 1
 2. Enumerated list item 2
+
+```eval_rst
+.. list-table::
+    :header-rows: 1
+
+    * - Header 1
+      - Header 2
+    * - Cell 1
+      - Cell 2
+```
 """
 
 
@@ -273,6 +283,10 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Bulleted list item 2': 'Élément de liste à puces 2',
                 'Enumerated list item 1': 'Élément de liste énumérée 1',
                 'Enumerated list item 2': 'Élément de liste énumérée 2',
+                'Header 1': 'En-tête 1',
+                'Header 2': 'En-tête 2',
+                'Cell 1': 'Cellule 1',
+                'Cell 2': 'Cellule 2',
                 # docutils ... optparse
                 '%prog [options]': '%prog [options]',
             }[args[0]]
@@ -329,6 +343,25 @@ Literal block
 
 1. Élément de liste énumérée 1
 1. Élément de liste énumérée 2
+
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd">
+<th class="head">En-tête 1</th>
+<th class="head">En-tête 2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even">
+<td>Cellule 1</td>
+<td>Cellule 2</td>
+</tr>
+</tbody>
+</table>
 """
 
     assert len(caplog.records) == 1

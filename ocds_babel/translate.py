@@ -6,10 +6,15 @@ import os
 from collections import OrderedDict
 from io import StringIO
 
+from docutils.frontend import OptionParser
+from docutils.parsers.rst import Parser, directives
 from docutils.utils import new_document
 from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
+from sphinx.application import Sphinx
 
 from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWORDS, TRANSLATABLE_EXTENSION_METADATA_KEYWORDS  # noqa: E501
+from ocds_babel.directives import NullDirective
 from ocds_babel.markdown_translator import MarkdownTranslator
 from ocds_babel.util import text_to_translate
 
@@ -115,11 +120,26 @@ def translate_extension_metadata(io, translator, lang='en', **kwargs):
     return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
 
 
-def translate_markdown(io, translator, settings=None, **kwargs):
+def translate_markdown(io, translator, **kwargs):
     text = io.read()
+
+    # This only needs to be run once, but is inexpensive.
+    for name in ('csv-table-no-translate', 'extensiontable'):
+        directives.register_directive(name, NullDirective)
+
+    # sphinx-build -b html -q -E …
+    app = Sphinx('.', None, '.', '.', 'html', status=None, freshenv=True)
+    # Avoid "recommonmark_config not setted, proceed default setting".
+    app.add_config_value('recommonmark_config', {}, True)
+    # From code comment in `new_document`.
+    settings = OptionParser(components=(Parser,)).get_default_values()
+    # Get minimal settings for `AutoStructify` to be applied.
+    settings.env = app.builder.env
 
     document = new_document(io.name, settings)
     CommonMarkParser().parse(text, document)
+    # To translate messages in `.. list-table`.
+    AutoStructify(document).apply()
     visitor = MarkdownTranslator(document, translator)
     document.walkabout(visitor)
 

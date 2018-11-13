@@ -14,8 +14,7 @@ setup(
     packages=find_packages(),
     long_description=long_description,
     install_requires=[
-        'Babel',
-        'docutils',
+        'Sphinx==1.5.1',
     ],
     extras_require={
         'test': [
