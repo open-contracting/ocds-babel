@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4 (2018-11-13)
+
+* Translate `list-table` ReStructuredText directives.
+
 ## 0.0.3 (2018-11-02)
 
 * Use universal newlines mode, to avoid CSV parsing errors.

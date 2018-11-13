@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='ocds-babel',
-    version='0.0.3',
+    version='0.0.4',
     author='Open Contracting Partnership',
     author_email='data@open-contracting.org',
     url='https://github.com/open-contracting/ocds-babel',
@@ -14,8 +14,7 @@ setup(
     packages=find_packages(),
     long_description=long_description,
     install_requires=[
-        'Babel',
-        'docutils',
+        'Sphinx==1.5.1',
     ],
     extras_require={
         'test': [
