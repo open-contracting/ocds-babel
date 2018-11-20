@@ -172,8 +172,8 @@ def translate_markdown_data(name, text, translator, **kwargs):
     Accepts a Markdown file as its filename and contents, and returns its translated contents in Markdown format.
     """
     # This only needs to be run once, but is inexpensive.
-    for name in ('csv-table-no-translate', 'extensiontable'):
-        directives.register_directive(name, NullDirective)
+    for directive_name in ('csv-table-no-translate', 'extensiontable'):
+        directives.register_directive(directive_name, NullDirective)
 
     # sphinx-build -b html -q -E …
     app = Sphinx('.', None, '.', '.', 'html', status=None, freshenv=True)
