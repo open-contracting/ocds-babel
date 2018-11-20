@@ -4,6 +4,7 @@ import json
 import logging
 import os
 from collections import OrderedDict
+from copy import deepcopy
 from io import StringIO
 
 from docutils.frontend import OptionParser
@@ -75,12 +76,12 @@ def translate_codelist(io, translator, **kwargs):
     return io.getvalue()
 
 
-def translate_codelist_data(iterator, translator, **kwargs):
+def translate_codelist_data(source, translator, **kwargs):
     """
     Accepts CSV rows as an iterable object (e.g. a list of dictionaries), and returns translated rows.
     """
     rows = []
-    for row in iterator:
+    for row in source:
         data = {}
         for key, value in row.items():
             text = text_to_translate(value, key in TRANSLATABLE_CODELIST_HEADERS)
@@ -98,26 +99,31 @@ def translate_schema(io, translator, **kwargs):
     """
     data = json.load(io, object_pairs_hook=OrderedDict)
 
-    translate_schema_data(data, translator, **kwargs)
+    data = translate_schema_data(data, translator, **kwargs)
 
     return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
 
 
-def translate_schema_data(data, translator, **kwargs):
+def translate_schema_data(source, translator, **kwargs):
     """
-    Accepts JSON data, and returns translated data. Modifies data in-place.
+    Accepts JSON data, and returns translated data.
     """
-    if isinstance(data, list):
-        for item in data:
-            translate_schema_data(item, translator, **kwargs)
-    elif isinstance(data, dict):
-        for key, value in data.items():
-            translate_schema_data(value, translator, **kwargs)
-            text = text_to_translate(value, key in TRANSLATABLE_SCHEMA_KEYWORDS)
-            if text:
-                data[key] = translator.gettext(text)
-                for old, new in kwargs.items():
-                    data[key] = data[key].replace('{{' + old + '}}', new)
+    def _translate_schema_data(data):
+        if isinstance(data, list):
+            for item in data:
+                _translate_schema_data(item)
+        elif isinstance(data, dict):
+            for key, value in data.items():
+                _translate_schema_data(value)
+                text = text_to_translate(value, key in TRANSLATABLE_SCHEMA_KEYWORDS)
+                if text:
+                    data[key] = translator.gettext(text)
+                    for old, new in kwargs.items():
+                        data[key] = data[key].replace('{{' + old + '}}', new)
+
+    data = deepcopy(source)
+    _translate_schema_data(data)
+    return data
 
 
 # This should roughly match the logic of `extract_extension_metadata`.
