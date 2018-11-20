@@ -133,6 +133,17 @@ def translate_extension_metadata(io, translator, lang='en', **kwargs):
     """
     data = json.load(io, object_pairs_hook=OrderedDict)
 
+    data = translate_extension_metadata_data(data, translator, lang, **kwargs)
+
+    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+
+
+def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
+    """
+    Accepts extension metadata, and returns translated metadata.
+    """
+    data = deepcopy(source)
+
     for key in TRANSLATABLE_EXTENSION_METADATA_KEYWORDS:
         value = data.get(key)
 
@@ -143,15 +154,23 @@ def translate_extension_metadata(io, translator, lang='en', **kwargs):
         if text:
             data[key] = {lang: translator.gettext(text)}
 
-    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+    return data
 
 
 def translate_markdown(io, translator, **kwargs):
     """
     Accepts a Markdown file as an IO object, and returns its translated contents in Markdown format.
     """
+    name = io.name
     text = io.read()
 
+    return translate_markdown_data(name, text, translator, **kwargs)
+
+
+def translate_markdown_data(name, text, translator, **kwargs):
+    """
+    Accepts a Markdown file as its filename and contents, and returns its translated contents in Markdown format.
+    """
     # This only needs to be run once, but is inexpensive.
     for name in ('csv-table-no-translate', 'extensiontable'):
         directives.register_directive(name, NullDirective)
@@ -165,7 +184,7 @@ def translate_markdown(io, translator, **kwargs):
     # Get minimal settings for `AutoStructify` to be applied.
     settings.env = app.builder.env
 
-    document = new_document(io.name, settings)
+    document = new_document(name, settings)
     CommonMarkParser().parse(text, document)
     # To translate messages in `.. list-table`.
     AutoStructify(document).apply()

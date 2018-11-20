@@ -2,7 +2,7 @@
 
 ## 0.0.5 (2018-11-20)
 
-* Add `translate_codelist_data` and `translate_schema_data`, which have objects as input and output.
+* Add `translate_codelist_data`, `translate_schema_data`, `translate_extension_metadata_data`, `translate_markdown_data`, which have parsed objects as input and output.
 
 ## 0.0.4 (2018-11-13)
 
