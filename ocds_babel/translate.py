@@ -4,6 +4,7 @@ import json
 import logging
 import os
 from collections import OrderedDict
+from copy import deepcopy
 from io import StringIO
 
 from docutils.frontend import OptionParser
@@ -59,19 +60,13 @@ def translate(configuration, localedir, language, **kwargs):
 
 # This should roughly match the logic of `extract_codelist`.
 def translate_codelist(io, translator, **kwargs):
+    """
+    Accepts a CSV file as an IO object, and returns its translated contents in CSV format.
+    """
     reader = csv.DictReader(io)
 
     fieldnames = [translator.gettext(fieldname) for fieldname in reader.fieldnames]
-
-    rows = []
-    for row in reader:
-        data = {}
-        for key, value in row.items():
-            text = text_to_translate(value, key in TRANSLATABLE_CODELIST_HEADERS)
-            if text:
-                value = translator.gettext(text)
-            data[translator.gettext(key)] = value
-        rows.append(data)
+    rows = translate_codelist_data(reader, translator, **kwargs)
 
     io = StringIO()
     writer = csv.DictWriter(io, fieldnames, lineterminator='\n')
@@ -81,31 +76,73 @@ def translate_codelist(io, translator, **kwargs):
     return io.getvalue()
 
 
+def translate_codelist_data(source, translator, **kwargs):
+    """
+    Accepts CSV rows as an iterable object (e.g. a list of dictionaries), and returns translated rows.
+    """
+    rows = []
+    for row in source:
+        data = {}
+        for key, value in row.items():
+            text = text_to_translate(value, key in TRANSLATABLE_CODELIST_HEADERS)
+            if text:
+                value = translator.gettext(text)
+            data[translator.gettext(key)] = value
+        rows.append(data)
+    return rows
+
+
 # This should roughly match the logic of `extract_schema`.
 def translate_schema(io, translator, **kwargs):
-    def _translate_schema(data):
+    """
+    Accepts a JSON file as an IO object, and returns its translated contents in JSON format.
+    """
+    data = json.load(io, object_pairs_hook=OrderedDict)
+
+    data = translate_schema_data(data, translator, **kwargs)
+
+    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+
+
+def translate_schema_data(source, translator, **kwargs):
+    """
+    Accepts JSON data, and returns translated data.
+    """
+    def _translate_schema_data(data):
         if isinstance(data, list):
             for item in data:
-                _translate_schema(item)
+                _translate_schema_data(item)
         elif isinstance(data, dict):
             for key, value in data.items():
-                _translate_schema(value)
+                _translate_schema_data(value)
                 text = text_to_translate(value, key in TRANSLATABLE_SCHEMA_KEYWORDS)
                 if text:
                     data[key] = translator.gettext(text)
                     for old, new in kwargs.items():
                         data[key] = data[key].replace('{{' + old + '}}', new)
 
-    data = json.load(io, object_pairs_hook=OrderedDict)
-
-    _translate_schema(data)
-
-    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+    data = deepcopy(source)
+    _translate_schema_data(data)
+    return data
 
 
 # This should roughly match the logic of `extract_extension_metadata`.
 def translate_extension_metadata(io, translator, lang='en', **kwargs):
+    """
+    Accepts an extension metadata file as an IO object, and returns its translated contents in JSON format.
+    """
     data = json.load(io, object_pairs_hook=OrderedDict)
+
+    data = translate_extension_metadata_data(data, translator, lang, **kwargs)
+
+    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+
+
+def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
+    """
+    Accepts extension metadata, and returns translated metadata.
+    """
+    data = deepcopy(source)
 
     for key in TRANSLATABLE_EXTENSION_METADATA_KEYWORDS:
         value = data.get(key)
@@ -117,15 +154,26 @@ def translate_extension_metadata(io, translator, lang='en', **kwargs):
         if text:
             data[key] = {lang: translator.gettext(text)}
 
-    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+    return data
 
 
 def translate_markdown(io, translator, **kwargs):
+    """
+    Accepts a Markdown file as an IO object, and returns its translated contents in Markdown format.
+    """
+    name = io.name
     text = io.read()
 
+    return translate_markdown_data(name, text, translator, **kwargs)
+
+
+def translate_markdown_data(name, text, translator, **kwargs):
+    """
+    Accepts a Markdown file as its filename and contents, and returns its translated contents in Markdown format.
+    """
     # This only needs to be run once, but is inexpensive.
-    for name in ('csv-table-no-translate', 'extensiontable'):
-        directives.register_directive(name, NullDirective)
+    for directive_name in ('csv-table-no-translate', 'extensiontable'):
+        directives.register_directive(directive_name, NullDirective)
 
     # sphinx-build -b html -q -E …
     app = Sphinx('.', None, '.', '.', 'html', status=None, freshenv=True)
@@ -136,7 +184,7 @@ def translate_markdown(io, translator, **kwargs):
     # Get minimal settings for `AutoStructify` to be applied.
     settings.env = app.builder.env
 
-    document = new_document(io.name, settings)
+    document = new_document(name, settings)
     CommonMarkParser().parse(text, document)
     # To translate messages in `.. list-table`.
     AutoStructify(document).apply()
