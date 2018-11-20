@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5 (2018-11-20)
+
+* Add `translate_codelist_data` and `translate_schema_data`, which have objects as input and output.
+
 ## 0.0.4 (2018-11-13)
 
 * Translate `list-table` ReStructuredText directives.
