@@ -1,4 +1,4 @@
-|PyPI version| |Build Status| |Dependency Status| |Coverage Status|
+|PyPI version| |Build Status| |Coverage Status|
 
 This Python package provides `Babel extractors <http://babel.pocoo.org/en/latest/messages.html>`__ and translation methods for OCDS documentation.
 
@@ -60,7 +60,5 @@ Methods are also available for translating ``extension.json`` and for translatin
    :target: https://badge.fury.io/py/ocds-babel
 .. |Build Status| image:: https://secure.travis-ci.org/open-contracting/ocds-babel.png
    :target: https://travis-ci.org/open-contracting/ocds-babel
-.. |Dependency Status| image:: https://requires.io/github/open-contracting/ocds-babel/requirements.svg
-   :target: https://requires.io/github/open-contracting/ocds-babel/requirements/
 .. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/ocds-babel/badge.png?branch=master
    :target: https://coveralls.io/github/open-contracting/ocds-babel?branch=master
