@@ -8,8 +8,9 @@ from copy import deepcopy
 from io import StringIO
 
 from docutils.frontend import OptionParser
+from docutils.io import InputError
 from docutils.parsers.rst import Parser, directives
-from docutils.utils import new_document
+from docutils.utils import new_document, SystemMessage
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 from sphinx.application import Sphinx
@@ -186,8 +187,15 @@ def translate_markdown_data(name, text, translator, **kwargs):
 
     document = new_document(name, settings)
     CommonMarkParser().parse(text, document)
+
     # To translate messages in `.. list-table`.
-    AutoStructify(document).apply()
+    try:
+        AutoStructify(document).apply()
+    except SystemMessage as e:
+        context = e.__context__
+        if isinstance(context, InputError) and context.strerror == 'No such file or directory':  # csv-table
+            logger.warning(e)
+
     visitor = MarkdownTranslator(document, translator)
     document.walkabout(visitor)
 

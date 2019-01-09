@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.6 (2019-01-09)
+
+* Fix errors due to `csv-table` directive in `translate_markdown_data`.
+
 ## 0.0.5 (2018-11-20)
 
 * Add `translate_codelist_data`, `translate_schema_data`, `translate_extension_metadata_data`, `translate_markdown_data`, which have parsed objects as input and output.
