@@ -1,4 +1,4 @@
-|PyPI version| |Build Status| |Coverage Status|
+|PyPI Version| |Build Status| |Coverage Status| |Python Version|
 
 This Python package provides `Babel extractors <http://babel.pocoo.org/en/latest/messages.html>`__ and translation methods for OCDS documentation.
 
@@ -56,9 +56,11 @@ In the Sphinx build configuration file (``conf.py``), you can use :code:`transla
 
 Methods are also available for translating ``extension.json`` and for translating Markdown-to-Markdown.
 
-.. |PyPI version| image:: https://badge.fury.io/py/ocds-babel.svg
-   :target: https://badge.fury.io/py/ocds-babel
+.. |PyPI Version| image:: https://img.shields.io/pypi/v/ocds-babel.svg
+   :target: https://pypi.org/project/ocds-babel/
 .. |Build Status| image:: https://secure.travis-ci.org/open-contracting/ocds-babel.png
    :target: https://travis-ci.org/open-contracting/ocds-babel
 .. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/ocds-babel/badge.png?branch=master
    :target: https://coveralls.io/github/open-contracting/ocds-babel?branch=master
+.. |Python Version| image:: https://img.shields.io/pypi/pyversions/ocds-babel.svg
+   :target: https://pypi.org/project/ocds-babel/
