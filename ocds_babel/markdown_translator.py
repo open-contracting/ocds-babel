@@ -1,15 +1,24 @@
-from docutils import nodes
+from docutils import core, nodes
 
 skippable = (
     'visit_document',
     'visit_tgroup',  # colgroup
     'depart_colspec',
-    'depart_image',
     'depart_list_item',
-    'depart_literal',
     'depart_section',
     'depart_tgroup',
     'depart_Text',
+    # Inline
+    'depart_emphasis',
+    'depart_image',
+    'depart_literal',
+    'depart_reference',
+    'depart_strong',
+    'visit_emphasis',
+    'visit_image',
+    'visit_literal',
+    'visit_reference',
+    'visit_strong',
 )
 
 
@@ -19,8 +28,8 @@ class MarkdownTranslator(nodes.NodeVisitor):
 
         # Whether we are writing output.
         self.writing = True
-        # The writing context. (`None` items are to avoid `IndexError`.)
-        self.context = [None, None]
+        # The writing context.
+        self.context = [None]
         # List item markers.
         self.markers = []
         # Table column specifications.
@@ -58,10 +67,8 @@ class MarkdownTranslator(nodes.NodeVisitor):
     # Text
 
     def visit_Text(self, node):
-        if self.context[-1] in ('block-raw', 'inline-raw'):
+        if self.context[-1] == 'block-raw':
             self.append(node.astext())
-        elif self.context[-1] in ('th', 'td'):
-            self.append(self.gettext(node.astext()))
 
     # System
 
@@ -96,8 +103,15 @@ class MarkdownTranslator(nodes.NodeVisitor):
     def visit_paragraph(self, node):
         if self.context[-1] == 'block-quote':
             self.append('> ')
-        if self.context[-1] not in ('th', 'td'):
-            self.append(self.gettext(node.rawsource))
+
+        message = self.gettext(node.rawsource)
+
+        if self.context[-1] in ('th', 'td'):
+            # Remove the opening "<p>" and closing "</p>\n".
+            # See http://docutils.sourceforge.net/docs/api/publisher.html#publish-parts-details
+            message = core.publish_parts(source=message, writer_name='html')['fragment'][3:-5]
+
+        self.append(message)
 
     def depart_paragraph(self, node):
         if self.context[-1] not in ('th', 'td'):
@@ -232,49 +246,3 @@ class MarkdownTranslator(nodes.NodeVisitor):
 
     def depart_entry(self, node):
         self.close_html_tag(None, self.context.pop())
-
-    # Table context
-
-    def visit_literal(self, node):
-        if self.context[-1] in ('th', 'td'):
-            self.context.append('inline-raw')
-            self.html_tag(None, 'code', suffix='', CLASS='docutils literal')
-            self.html_tag(None, 'span', suffix='', CLASS='pre')
-
-    def depart_literal(self, node):
-        if self.context[-2] in ('th', 'td'):
-            self.context.pop()
-            self.close_html_tag(None, 'span', suffix='')
-            self.close_html_tag(None, 'code', suffix='')
-
-    def visit_emphasis(self, node):
-        if self.context[-1] in ('th', 'td'):
-            self.html_tag(None, 'em', suffix='')
-
-    def depart_emphasis(self, node):
-        if self.context[-1] in ('th', 'td'):
-            self.close_html_tag(None, 'em', suffix='')
-
-    def visit_strong(self, node):
-        if self.context[-1] in ('th', 'td'):
-            self.html_tag(None, 'strong', suffix='')
-
-    def depart_strong(self, node):
-        if self.context[-1] in ('th', 'td'):
-            self.close_html_tag(None, 'strong', suffix='')
-
-    def visit_reference(self, node):
-        if self.context[-1] in ('th', 'td'):
-            self.html_tag(None, 'a', suffix='', href=node['refuri'])
-
-    def depart_reference(self, node):
-        if self.context[-1] in ('th', 'td'):
-            self.close_html_tag(None, 'a', suffix='')
-
-    def visit_image(self, node):
-        if self.context[-1] in ('th', 'td'):
-            if 'alt' in node:
-                alt = self.gettext(node['alt'])
-            else:
-                alt = ''
-            self.html_tag(None, 'img', suffix='', src=node['uri'], alt=alt)

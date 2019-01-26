@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.8 (2019-01-26)
+
+* Fix inline rendering in `list-table` ReStructuredText directives.
+
 ## 0.0.7 (2019-01-25)
 
 * Render inline elements in `list-table` ReStructuredText directives.

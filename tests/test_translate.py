@@ -97,13 +97,10 @@ Literal block
 .. list-table::
     :header-rows: 1
 
-    * - Header 1
-      - *Header 2*
-      - **Header 3**
-    * - ``Code``
-      - `Link <http://example.com>`__
-      - .. image:: picture.png
-           :alt: Text
+    * - Before *Header 1* After
+      - Before **Header 2** After
+    * - Before ``Code`` After
+      - Before `Link <http://example.com>`__ After
 ```
 """
 
@@ -286,11 +283,10 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Bulleted list item 2': 'Élément de liste à puces 2',
                 'Enumerated list item 1': 'Élément de liste énumérée 1',
                 'Enumerated list item 2': 'Élément de liste énumérée 2',
-                'Header 1': 'En-tête 1',
-                'Header 2': 'En-tête 2',
-                'Header 3': 'En-tête 3',
-                'Link': 'Lien',
-                'Text': 'Texte',
+                'Before *Header 1* After': 'Avant *En-tête 1* Après',
+                'Before **Header 2** After': 'Avant **En-tête 2** Après',
+                'Before ``Code`` After': 'Avant ``Code`` Après',
+                'Before `Link <http://example.com>`__ After': 'Avant `Lien <http://example.com>`__ Après',
                 # docutils ... optparse
                 '%prog [options]': '%prog [options]',
             }[args[0]]
@@ -350,22 +346,19 @@ Literal block
 
 <table border="1" class="docutils">
 <colgroup>
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd">
-<th class="head">En-tête 1</th>
-<th class="head"><em>En-tête 2</em></th>
-<th class="head"><strong>En-tête 3</strong></th>
+<th class="head">Avant <em>En-tête 1</em> Après</th>
+<th class="head">Avant <strong>En-tête 2</strong> Après</th>
 </tr>
 </thead>
 <tbody valign="top">
 <tr class="row-even">
-<td><code class="docutils literal"><span class="pre">Code</span></code></td>
-<td><a href="http://example.com">Lien</a></td>
-<td><img src="picture.png" alt="Texte"></td>
+<td>Avant <tt class="docutils literal">Code</tt> Après</td>
+<td>Avant <a class="reference external" href="http://example.com">Lien</a> Après</td>
 </tr>
 </tbody>
 </table>
