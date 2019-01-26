@@ -98,9 +98,12 @@ Literal block
     :header-rows: 1
 
     * - Header 1
-      - Header 2
-    * - Cell 1
-      - Cell 2
+      - *Header 2*
+      - **Header 3**
+    * - ``Code``
+      - `Link <http://example.com>`__
+      - .. image:: picture.png
+           :alt: Text
 ```
 """
 
@@ -285,8 +288,9 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Enumerated list item 2': 'Élément de liste énumérée 2',
                 'Header 1': 'En-tête 1',
                 'Header 2': 'En-tête 2',
-                'Cell 1': 'Cellule 1',
-                'Cell 2': 'Cellule 2',
+                'Header 3': 'En-tête 3',
+                'Link': 'Lien',
+                'Text': 'Texte',
                 # docutils ... optparse
                 '%prog [options]': '%prog [options]',
             }[args[0]]
@@ -346,19 +350,22 @@ Literal block
 
 <table border="1" class="docutils">
 <colgroup>
-<col width="50%" />
-<col width="50%" />
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd">
 <th class="head">En-tête 1</th>
-<th class="head">En-tête 2</th>
+<th class="head"><em>En-tête 2</em></th>
+<th class="head"><strong>En-tête 3</strong></th>
 </tr>
 </thead>
 <tbody valign="top">
 <tr class="row-even">
-<td>Cellule 1</td>
-<td>Cellule 2</td>
+<td><code class="docutils literal"><span class="pre">Code</span></code></td>
+<td><a href="http://example.com">Lien</a></td>
+<td><img src="picture.png" alt="Texte"></td>
 </tr>
 </tbody>
 </table>

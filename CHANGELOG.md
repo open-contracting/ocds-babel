@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.7 (2019-01-25)
+
+* Render inline elements in `list-table` ReStructuredText directives.
+
 ## 0.0.6 (2019-01-09)
 
 * Fix errors due to `csv-table` directive in `translate_markdown_data`.
