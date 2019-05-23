@@ -7,23 +7,18 @@ from collections import OrderedDict
 from copy import deepcopy
 from io import StringIO
 
-from docutils.frontend import OptionParser
-from docutils.io import InputError
-from docutils.parsers.rst import Parser, directives
-from docutils.utils import new_document, SystemMessage
-from recommonmark.parser import CommonMarkParser
-from recommonmark.transform import AutoStructify
-from sphinx.application import Sphinx
-
-from ocds_babel import TRANSLATABLE_CODELIST_HEADERS, TRANSLATABLE_SCHEMA_KEYWORDS, TRANSLATABLE_EXTENSION_METADATA_KEYWORDS  # noqa: E501
-from ocds_babel.directives import NullDirective
-from ocds_babel.markdown_translator import MarkdownTranslator
+from ocds_babel import TRANSLATABLE_SCHEMA_KEYWORDS, TRANSLATABLE_EXTENSION_METADATA_KEYWORDS  # noqa: E501
 from ocds_babel.util import text_to_translate
+
+try:
+    from ocds_babel.translate_markdown import translate_markdown, translate_markdown_data  # noqa
+except ImportError:
+    pass
 
 logger = logging.getLogger('ocds_babel')
 
 
-def translate(configuration, localedir, language, **kwargs):
+def translate(configuration, localedir, language, headers, **kwargs):
     """
     Writes files, translating any translatable strings.
 
@@ -44,30 +39,31 @@ def translate(configuration, localedir, language, **kwargs):
         for source in sources:
             basename = os.path.basename(source)
             with open(source) as r, open(os.path.join(target, basename), 'w') as w:
-                if source.endswith('.csv'):
+                if basename == 'extension.json':
+                    method = translate_extension_metadata
+                    kwargs.update(lang=language)
+                elif source.endswith('.csv'):
                     method = translate_codelist
-                elif source.endswith('-schema.json'):
+                    kwargs.update(headers=headers)
+                elif source.endswith('.json'):
                     method = translate_schema
                     kwargs.update(lang=language)
                 elif source.endswith('.md'):
                     method = translate_markdown
-                elif basename == 'extension.json':
-                    method = translate_extension_metadata
-                    kwargs.update(lang=language)
                 else:
                     raise NotImplementedError(basename)
                 w.write(method(r, translators[domain], **kwargs))
 
 
 # This should roughly match the logic of `extract_codelist`.
-def translate_codelist(io, translator, **kwargs):
+def translate_codelist(io, translator, headers=[], **kwargs):
     """
     Accepts a CSV file as an IO object, and returns its translated contents in CSV format.
     """
     reader = csv.DictReader(io)
 
     fieldnames = [translator.gettext(fieldname) for fieldname in reader.fieldnames]
-    rows = translate_codelist_data(reader, translator, **kwargs)
+    rows = translate_codelist_data(reader, translator, headers, **kwargs)
 
     io = StringIO()
     writer = csv.DictWriter(io, fieldnames, lineterminator='\n')
@@ -77,7 +73,7 @@ def translate_codelist(io, translator, **kwargs):
     return io.getvalue()
 
 
-def translate_codelist_data(source, translator, **kwargs):
+def translate_codelist_data(source, translator, headers=[], **kwargs):
     """
     Accepts CSV rows as an iterable object (e.g. a list of dictionaries), and returns translated rows.
     """
@@ -85,7 +81,7 @@ def translate_codelist_data(source, translator, **kwargs):
     for row in source:
         data = {}
         for key, value in row.items():
-            text = text_to_translate(value, key in TRANSLATABLE_CODELIST_HEADERS)
+            text = text_to_translate(value, key in headers)
             if text:
                 value = translator.gettext(text)
             data[translator.gettext(key)] = value
@@ -156,47 +152,3 @@ def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
             data[key] = {lang: translator.gettext(text)}
 
     return data
-
-
-def translate_markdown(io, translator, **kwargs):
-    """
-    Accepts a Markdown file as an IO object, and returns its translated contents in Markdown format.
-    """
-    name = io.name
-    text = io.read()
-
-    return translate_markdown_data(name, text, translator, **kwargs)
-
-
-def translate_markdown_data(name, text, translator, **kwargs):
-    """
-    Accepts a Markdown file as its filename and contents, and returns its translated contents in Markdown format.
-    """
-    # This only needs to be run once, but is inexpensive.
-    for directive_name in ('csv-table-no-translate', 'extensiontable'):
-        directives.register_directive(directive_name, NullDirective)
-
-    # sphinx-build -b html -q -E …
-    app = Sphinx('.', None, '.', '.', 'html', status=None, freshenv=True)
-    # Avoid "recommonmark_config not setted, proceed default setting".
-    app.add_config_value('recommonmark_config', {}, True)
-    # From code comment in `new_document`.
-    settings = OptionParser(components=(Parser,)).get_default_values()
-    # Get minimal settings for `AutoStructify` to be applied.
-    settings.env = app.builder.env
-
-    document = new_document(name, settings)
-    CommonMarkParser().parse(text, document)
-
-    # To translate messages in `.. list-table`.
-    try:
-        AutoStructify(document).apply()
-    except SystemMessage as e:
-        context = e.__context__
-        if isinstance(context, InputError) and context.strerror == 'No such file or directory':  # csv-table
-            logger.warning(e)
-
-    visitor = MarkdownTranslator(document, translator)
-    document.walkabout(visitor)
-
-    return visitor.astext()

@@ -8,6 +8,8 @@ from tempfile import TemporaryDirectory
 
 from ocds_babel.translate import translate
 
+headers = ['Title', 'Description', 'Extension']
+
 codelist = """Code,Title,Description
 open,  Open  ,  All interested suppliers may submit a tender.  
 selective,  Selective  ,  Only qualified suppliers are invited to submit a tender.  
@@ -132,7 +134,7 @@ def test_translate_codelists(monkeypatch, caplog):
         with TemporaryDirectory() as builddir:
             translate([
                 (glob(os.path.join(sourcedir, '*.csv')), builddir, 'codelists'),
-            ], '', 'es')
+            ], '', 'es', headers)
 
             with open(os.path.join(builddir, 'method.csv')) as f:
                 rows = [dict(row) for row in csv.DictReader(f)]
@@ -183,7 +185,7 @@ def test_translate_schema(monkeypatch, caplog):
         with TemporaryDirectory() as builddir:
             translate([
                 ([os.path.join(sourcedir, 'record-package-schema.json')], builddir, 'schema'),
-            ], '', 'es', version='1.1')
+            ], '', 'es', headers, version='1.1')
 
             with open(os.path.join(builddir, 'record-package-schema.json')) as f:
                 data = json.load(f)
@@ -243,7 +245,7 @@ def test_translate_extension_metadata(monkeypatch, caplog):
             with TemporaryDirectory() as builddir:
                 translate([
                     ([os.path.join(sourcedir, 'extension.json')], builddir, 'schema'),
-                ], '', 'es')
+                ], '', 'es', headers)
 
                 with open(os.path.join(builddir, 'extension.json')) as f:
                     data = json.load(f)
@@ -302,7 +304,7 @@ def test_translate_markdown(monkeypatch, caplog):
         with TemporaryDirectory() as builddir:
             translate([
                 ([os.path.join(sourcedir, 'README.md')], builddir, 'docs'),
-            ], '', 'fr')
+            ], '', 'fr', headers)
 
             with open(os.path.join(builddir, 'README.md')) as f:
                 text = f.read()

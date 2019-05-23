@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0 (2019-05-23)
+
+This version contains backwards-incompatible changes. These changes were made so that the package can be shared between the Open Contracting Data Standard (OCDS) and Beneficial Ownership Data Standard (BODS). You must now:
+
+* Specify the headers to translate and the files to ignore (if any) in configuration files that use the `ocds_codelist` entry point.
+* Specify the headers to translate in a `headers` argument to the `translate` method.
+* Separately install Sphinx 1.5.1 if you are translating Markdown-to-Markdown.
+
+The readme instructions reflect these changes.
+
 ## 0.0.8 (2019-01-26)
 
 * Fix inline rendering in `list-table` ReStructuredText directives.
