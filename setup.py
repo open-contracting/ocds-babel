@@ -9,14 +9,14 @@ setup(
     author='Open Contracting Partnership',
     author_email='data@open-contracting.org',
     url='https://github.com/open-contracting/ocds-babel',
-    description='Provides Babel extractors and translation methods for OCDS documentation',
+    description='Provides Babel extractors and translation methods for standards like OCDS or BODS',
     license='BSD',
     packages=find_packages(),
     long_description=long_description,
-    install_requires=[
-        'Sphinx==1.5.1',
-    ],
     extras_require={
+        'markdown': [
+            'Sphinx==1.5.1',
+        ],
         'test': [
             'coveralls',
             'pytest',
