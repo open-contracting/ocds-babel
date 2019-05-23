@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='ocds-babel',
-    version='0.0.8',
+    version='0.1.0',
     author='Open Contracting Partnership',
     author_email='data@open-contracting.org',
     url='https://github.com/open-contracting/ocds-babel',

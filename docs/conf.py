@@ -27,7 +27,7 @@ copyright = '2018, Open Contracting Partnership'
 author = 'Open Contracting Partnership'
 
 # The short X.Y version
-version = '0.0.8'
+version = '0.1.0'
 # The full version, including alpha/beta/rc tags
 release = version
 
