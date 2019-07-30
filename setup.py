@@ -11,7 +11,7 @@ setup(
     url='https://github.com/open-contracting/ocds-babel',
     description='Provides Babel extractors and translation methods for standards like OCDS or BODS',
     license='BSD',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests', 'tests.*']),
     long_description=long_description,
     extras_require={
         'markdown': [
