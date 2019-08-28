@@ -10,7 +10,7 @@ This version contains backwards-incompatible changes. These changes were made so
 -  Specify the headers to translate in a ``headers`` argument to the ``translate`` method.
 -  Separately install Sphinx 1.5.1 if you are translating Markdown-to-Markdown.
 
-The readme instructions reflect these changes.
+The documentation reflects these changes.
 
 .. _section-1:
 
