@@ -1,6 +1,6 @@
 |PyPI Version| |Build Status| |Coverage Status| |Python Version|
 
-This Python package provides `Babel extractors <http://babel.pocoo.org/en/latest/messages.html>`__ and translation methods for standards like the Open Contracting Data Standard (OCDS) or Beneficial Ownership Data Standard (BODS).
+This Python package provides `Babel extractors <http://babel.pocoo.org/en/latest/messages.html>`__ and translation methods for standards that use JSON Schema and CSV codelists with `custom JSON Schema properties <https://os4d.opendataservices.coop/development/schema/#extended-json-schema>`__, like the Open Contracting Data Standard (OCDS) or Beneficial Ownership Data Standard (BODS).
 
 Examples
 --------
