@@ -159,4 +159,4 @@ def _json_load(io):
 
 
 def _json_dumps(data):
-    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+    return json.dumps(data, ensure_ascii=False, indent=2, separators=(',', ': '))
