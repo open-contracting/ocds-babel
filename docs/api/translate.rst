@@ -43,8 +43,8 @@ or::
 
     pip install 'Sphinx==1.5.1'
 
-API documentation
------------------
+API
+---
 
 .. automodule:: ocds_babel.translate
    :members:

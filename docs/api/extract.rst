@@ -26,8 +26,8 @@ in ``babel_bods_codelist.cfg``, and::
 
 in ``babel_bods_schema.cfg``.
 
-API documentation
------------------
+API
+---
 
 .. automodule:: ocds_babel.extract
    :members:
