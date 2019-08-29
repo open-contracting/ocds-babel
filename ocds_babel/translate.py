@@ -94,11 +94,11 @@ def translate_schema(io, translator, **kwargs):
     """
     Accepts a JSON file as an IO object, and returns its translated contents in JSON format.
     """
-    data = json.load(io, object_pairs_hook=OrderedDict)
+    data = _json_load(io)
 
     data = translate_schema_data(data, translator, **kwargs)
 
-    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+    return _json_dumps(data)
 
 
 def translate_schema_data(source, translator, **kwargs):
@@ -128,11 +128,11 @@ def translate_extension_metadata(io, translator, lang='en', **kwargs):
     """
     Accepts an extension metadata file as an IO object, and returns its translated contents in JSON format.
     """
-    data = json.load(io, object_pairs_hook=OrderedDict)
+    data = _json_load(io)
 
     data = translate_extension_metadata_data(data, translator, lang, **kwargs)
 
-    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
+    return _json_dumps(data)
 
 
 def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
@@ -152,3 +152,11 @@ def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
             data[key] = {lang: translator.gettext(text)}
 
     return data
+
+
+def _json_load(io):
+    return json.load(io, object_pairs_hook=OrderedDict)
+
+
+def _json_dumps(data):
+    return json.dumps(data, indent=2, separators=(',', ': '), ensure_ascii=False)
