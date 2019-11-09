@@ -10,10 +10,3 @@ OCDS Babel |release|
    api/extract
    api/translate
    changelog
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
