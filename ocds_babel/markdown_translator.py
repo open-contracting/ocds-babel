@@ -2,23 +2,30 @@ from docutils import core, nodes
 
 skippable = (
     'visit_document',
-    'visit_tgroup',  # colgroup
     'depart_colspec',
     'depart_list_item',
     'depart_section',
+    # Handled instead via `colspec` nodes.
     'depart_tgroup',
-    'depart_Text',
-    # Inline
+    'visit_tgroup',
+    # Inline node
     'depart_emphasis',
     'depart_image',
     'depart_literal',
+    'depart_pending_xref',
+    'depart_raw',
     'depart_reference',
     'depart_strong',
     'visit_emphasis',
     'visit_image',
     'visit_literal',
+    'visit_pending_xref',
+    'visit_raw',
     'visit_reference',
     'visit_strong',
+    # Text node
+    'depart_Text',
+    'visit_Text',
 )
 
 
@@ -26,20 +33,26 @@ class MarkdownTranslator(nodes.NodeVisitor):
     def __init__(self, document, translator):
         nodes.NodeVisitor.__init__(self, document)
 
-        # Whether we are writing output.
+        # Whether we are writing to the output.
         self.writing = True
-        # The writing context.
-        self.context = [None]
-        # List item markers.
+
+        # The writing context: 'block-quote', 'td' or 'th'.
+        self.contexts = [None]
+        # List item markers: '*' or '1.'.
         self.markers = []
         # Table column specifications.
         self.colspecs = []
         # For zebra tables.
-        self.table_row_index = 0
+        self.table_row_index = 1
+
         # The output.
         self.text = ''
 
         self.translator = translator
+
+    @property
+    def context(self):
+        return self.contexts[-1]
 
     def append(self, text):
         if self.writing:
@@ -64,12 +77,6 @@ class MarkdownTranslator(nodes.NodeVisitor):
             return skip
         return error
 
-    # Text
-
-    def visit_Text(self, node):
-        if self.context[-1] == 'block-raw':
-            self.append(node.astext())
-
     # System
 
     def depart_document(self, node):
@@ -81,32 +88,21 @@ class MarkdownTranslator(nodes.NodeVisitor):
     def depart_system_message(self, node):
         self.writing = True
 
-    # Block or inline
-
-    def visit_raw(self, node):
-        if node.parent.tagname != 'paragraph':
-            self.context.append('block-raw')
-
-    def depart_raw(self, node):
-        if node.parent.tagname != 'paragraph':
-            self.context.pop()
-            self.append('\n\n')
-
     # Block
 
     def visit_block_quote(self, node):
-        self.context.append('block-quote')
+        self.contexts.append('block-quote')
 
     def depart_block_quote(self, node):
-        self.context.pop()
+        self.contexts.pop()
 
     def visit_paragraph(self, node):
-        if self.context[-1] == 'block-quote':
+        if self.context == 'block-quote':
             self.append('> ')
 
         message = self.gettext(node.rawsource)
 
-        if self.context[-1] in ('th', 'td'):
+        if self.context in ('td', 'th'):
             # Remove the opening "<p>" and closing "</p>\n".
             # See http://docutils.sourceforge.net/docs/api/publisher.html#publish-parts-details
             message = core.publish_parts(source=message, writer_name='html')['fragment'][3:-5]
@@ -114,7 +110,7 @@ class MarkdownTranslator(nodes.NodeVisitor):
         self.append(message)
 
     def depart_paragraph(self, node):
-        if self.context[-1] not in ('th', 'td'):
+        if self.context not in ('td', 'th'):
             self.append('\n')
             if not self.markers:
                 self.append('\n')
@@ -126,8 +122,8 @@ class MarkdownTranslator(nodes.NodeVisitor):
             text = node.rawsource
         else:
             text = node.astext()
-            if not text.endswith('\n'):
-                text += '\n'
+        if not text.endswith('\n'):
+            text += '\n'
         self.append(text)
 
     def depart_literal_block(self, node):
@@ -204,8 +200,8 @@ class MarkdownTranslator(nodes.NodeVisitor):
     # Tables
 
     def visit_table(self, node):
-        self.table_row_index = 0
         self.html_tag(node, border='1', CLASS='docutils')
+        self.table_row_index = 1
 
     def depart_table(self, node):
         self.close_html_tag(node, suffix='\n\n')
@@ -228,8 +224,8 @@ class MarkdownTranslator(nodes.NodeVisitor):
         self.close_html_tag(node)
 
     def visit_row(self, node):
-        self.table_row_index += 1
         self.html_tag(None, 'tr', CLASS='row-odd' if self.table_row_index % 2 else 'row-even')
+        self.table_row_index += 1
 
     def depart_row(self, node):
         self.close_html_tag(None, 'tr')
@@ -241,8 +237,8 @@ class MarkdownTranslator(nodes.NodeVisitor):
         else:
             tagname = 'td'
             atts = {}
-        self.context.append(tagname)
+        self.contexts.append(tagname)  # needs to be `tagname`, for `depart_entry` to use
         self.html_tag(None, tagname, suffix='', **atts)
 
     def depart_entry(self, node):
-        self.close_html_tag(None, self.context.pop())
+        self.close_html_tag(None, self.contexts.pop())

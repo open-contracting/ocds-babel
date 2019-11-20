@@ -60,11 +60,15 @@ extension_metadata_language_map = """{
   ]
 }"""
 
-extension_readme = """# Heading 1
+extension_readme = """##### Skip Heading
+
+# Heading 1
 
 ## Heading 2
 
-Paragraph text and `literal text`
+### Heading **3**
+
+Paragraph text and ```literal text```
 
 `Literal text`
 
@@ -88,6 +92,14 @@ Literal block
 ```
 
 <h3>Subheading</h3>
+
+![Caption](http://example.com/example.png)
+
+This is a [pending](examples/test.md) xref.
+
+This is a **[bold link](http://example.com/test.md)**.
+
+This is <em>inline HTML</em>.
 
 * Bulleted list item 1
 * Bulleted list item 2
@@ -276,11 +288,18 @@ def test_translate_markdown(monkeypatch, caplog):
 
         def gettext(self, *args, **kwargs):
             return {
+                'Skip Heading': 'Entête à sauter',
                 'Heading 1': 'Titre 1',
                 'Heading 2': 'Titre 2',
-                'Paragraph text and `literal text`': 'Texte de paragraphe et `texte littéral`',
+                'Heading **3**': 'Titre **3**',
+                'Paragraph text and ```literal text```': 'Texte de paragraphe et ```texte littéral```',
                 '`Literal text`': '`Texte littéral`',
                 'Blockquote text': 'Texte de citation',
+                '![Caption](http://example.com/example.png)': '![Légende](http://example.com/example-fr.png)',
+                'This is a [pending](examples/test.md) xref.': 'Ceci est un xref [en suspens](examples/test.md).',
+                'This is a **[bold link](http://example.com/test.md)**.': 'Ceci est un **[lien en gras](http://example.com/test.md)**.',  # noqa
+                'This is <em>inline HTML</em>.': 'Ceci est <em>HTML en ligne</em>.',
+                '<h3>Subheading</h3>': '<h3>Sous-titre</h3>',
                 'Bulleted list item 1': 'Élément de liste à puces 1',
                 'Bulleted list item 2': 'Élément de liste à puces 2',
                 'Enumerated list item 1': 'Élément de liste énumérée 1',
@@ -309,11 +328,15 @@ def test_translate_markdown(monkeypatch, caplog):
             with open(os.path.join(builddir, 'README.md')) as f:
                 text = f.read()
 
-    assert text == """# Titre 1
+    assert text == """##### Entête à sauter
+
+# Titre 1
 
 ## Titre 2
 
-Texte de paragraphe et `texte littéral`
+### Titre **3**
+
+Texte de paragraphe et ```texte littéral```
 
 `Texte littéral`
 
@@ -323,7 +346,7 @@ Texte de paragraphe et `texte littéral`
 Raw paragraph text
 ```
 
-```none
+```
 Literal block
 ```
 
@@ -338,7 +361,15 @@ Literal block
    :extension: location
 ```
 
-<h3>Subheading</h3>
+<h3>Sous-titre</h3>
+
+![Légende](http://example.com/example-fr.png)
+
+Ceci est un xref [en suspens](examples/test.md).
+
+Ceci est un **[lien en gras](http://example.com/test.md)**.
+
+Ceci est <em>HTML en ligne</em>.
 
 * Élément de liste à puces 1
 * Élément de liste à puces 2

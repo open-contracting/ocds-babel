@@ -15,7 +15,7 @@ setup(
     long_description=long_description,
     extras_require={
         'markdown': [
-            'Sphinx==1.5.1',
+            'Sphinx',
         ],
         'test': [
             'coveralls',
