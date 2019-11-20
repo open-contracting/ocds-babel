@@ -5,22 +5,9 @@ python:
   - "3.6"
 env:
   - BASEDIR="https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master"
-matrix:
-  include:
-    - SPHINX='Sphinx>=1.5,<1.6'
-    - SPHINX='Sphinx>=1.6,<1.7'
-    - SPHINX='Sphinx>=1.7,<1.8'
-    - SPHINX='Sphinx>=1.8,<2.0'
-    - SPHINX='Sphinx>=2.0,<2.1'
-    - SPHINX='Sphinx>=2.1,<2.2'
-    - SPHINX='Sphinx>=2.2,<2.3'
 install:
   - curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
-  - pip install .[test]
-  - pip install $SPHINX
-  - pip install -e git+https://github.com/jpmckinney/commonmark.py.git@hotfix#egg=commonmark -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
+  - pip install tox-travis
 script:
   - curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
-  - pytest --cov ocds_babel
-after_success:
-  coveralls
+  - tox

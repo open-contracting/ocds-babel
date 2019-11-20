@@ -21,9 +21,7 @@ setup(
             'Sphinx>=1.6',
         ],
         'test': [
-            'coveralls',
             'pytest',
-            'pytest-cov',
         ],
         'docs': [
             'Sphinx',
