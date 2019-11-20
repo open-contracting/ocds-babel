@@ -52,7 +52,7 @@ or install a specific version like::
 
 Then, install the forks of CommonMark and recommonmark::
 
-    pip install -e git+https://github.com/jpmckinney/commonmark.git@hotfix#egg=commonmark -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
+    pip install -e git+https://github.com/jpmckinney/commonmark.py.git@hotfix#egg=commonmark -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
 
 API
 ---
