@@ -35,13 +35,24 @@ In the Sphinx build configuration file (``conf.py``), you can use :code:`transla
 #. Target language (the code of the language to translate to)
 #. Optional keyword arguments to replace ``{{marker}}`` markers with values, e.g. :code:`version='1.1'`
 
-Methods are also available for translating ``extension.json`` and for translating Markdown-to-Markdown. If the latter, you must install Sphinx 1.5.1, with either::
+Methods are also available for translating ``extension.json`` and for translating Markdown files.
+
+Install requirements for Markdown translation
+---------------------------------------------
+
+To translate Markdown files, you must install Sphinx>=1.6 and (for now) forks of [CommonMark](https://commonmarkpy.readthedocs.io/en/latest/) and [recommonmark](https://recommonmark.readthedocs.io/en/latest/).
+
+Install a recent version of Sphinx with::
 
     pip install ocds-babel[markdown]
 
-or::
+or install a specific version like::
 
-    pip install 'Sphinx==1.5.1'
+    pip install 'Sphinx==2.2.1'
+
+Then, install the forks of CommonMark and recommonmark::
+
+    pip install -e git+https://github.com/jpmckinney/commonmark.py.git@hotfix#egg=commonmark -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
 
 API
 ---

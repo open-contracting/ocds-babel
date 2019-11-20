@@ -1,5 +1,3 @@
-"""
-"""
 import logging
 
 from docutils.frontend import OptionParser
@@ -9,6 +7,7 @@ from docutils.utils import new_document, SystemMessage
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 from sphinx.application import Sphinx
+from sphinx.util.docutils import docutils_namespace, patch_docutils
 
 from ocds_babel.directives import NullDirective
 from ocds_babel.markdown_translator import MarkdownTranslator
@@ -34,27 +33,29 @@ def translate_markdown_data(name, text, translator, **kwargs):
     for directive_name in ('csv-table-no-translate', 'extensiontable'):
         directives.register_directive(directive_name, NullDirective)
 
-    # sphinx-build -b html -q -E …
-    app = Sphinx('.', None, '.', '.', 'html', status=None, freshenv=True)
-    # Avoid "recommonmark_config not setted, proceed default setting".
-    app.add_config_value('recommonmark_config', {}, True)
-    # From code comment in `new_document`.
-    settings = OptionParser(components=(Parser,)).get_default_values()
-    # Get minimal settings for `AutoStructify` to be applied.
-    settings.env = app.builder.env
+    with patch_docutils(), docutils_namespace():
+        # sphinx-build -b html -q -E …
+        app = Sphinx('.', None, 'outdir', '.', 'html', status=None, freshenv=True)
+        # Avoid "recommonmark_config not setted, proceed default setting".
+        app.add_config_value('recommonmark_config', {}, True)
 
-    document = new_document(name, settings)
-    CommonMarkParser().parse(text, document)
+        # From code comment in `new_document`.
+        settings = OptionParser(components=(Parser,)).get_default_values()
+        # Get minimal settings for `AutoStructify` to be applied.
+        settings.env = app.builder.env
 
-    # To translate messages in `.. list-table`.
-    try:
-        AutoStructify(document).apply()
-    except SystemMessage as e:
-        context = e.__context__
-        if isinstance(context, InputError) and context.strerror == 'No such file or directory':  # csv-table
-            logger.warning(e)
+        document = new_document(name, settings)
+        CommonMarkParser().parse(text, document)
 
-    visitor = MarkdownTranslator(document, translator)
-    document.walkabout(visitor)
+        # To translate messages in `.. list-table`.
+        try:
+            AutoStructify(document).apply()
+        except SystemMessage as e:
+            context = e.__context__
+            if isinstance(context, InputError) and context.strerror == 'No such file or directory':  # csv-table
+                logger.warning(e)
 
-    return visitor.astext()
+        visitor = MarkdownTranslator(document, translator)
+        document.walkabout(visitor)
+
+        return visitor.astext()

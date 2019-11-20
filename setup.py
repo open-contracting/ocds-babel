@@ -15,7 +15,10 @@ setup(
     long_description=long_description,
     extras_require={
         'markdown': [
-            'Sphinx==1.5.1',
+            'docutils',
+            # See docs/api/translate.rst
+            # 'recommonmark',
+            'Sphinx>=1.6',
         ],
         'test': [
             'coveralls',
