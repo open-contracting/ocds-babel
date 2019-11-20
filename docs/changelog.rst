@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.2.0 (2019-11-19)
+~~~~~~~~~~~~~~~~~~
+
+-  Translate images and HTML.
+-  Support recent versions of Sphinx (requires forks of recommonmark and commonmark with bugfixes for now).
+-  **Backwards-incompatible change:** Sphinx<1.6 is not supported.
+
 0.1.0 (2019-05-23)
 ~~~~~~~~~~~~~~~~~~
 
