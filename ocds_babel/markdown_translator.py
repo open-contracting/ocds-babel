@@ -58,7 +58,7 @@ class MarkdownTranslator(nodes.NodeVisitor):
         if self.writing:
             self.text += text
 
-    # See https://github.com/sphinx-doc/sphinx/blob/v1.5.1/sphinx/util/nodes.py#L142-L166
+    # See https://github.com/sphinx-doc/sphinx/blob/v2.2.1/sphinx/util/nodes.py#L252-L276
     def gettext(self, message):
         return self.translator.gettext(message.strip())
 

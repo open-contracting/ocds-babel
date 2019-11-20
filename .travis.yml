@@ -17,7 +17,7 @@ install:
   - curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
   - pip install .[test]
   - pip install Sphinx==$SPHINX_VERSION
-  - pip install -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark -e git+https://github.com/jpmckinney/commonmark-py.git@hotfix#egg=recommonmark
+  - pip install -e git+https://github.com/jpmckinney/commonmark-py.git@hotfix#egg=recommonmark -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
 script:
   - curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
   - pytest --cov ocds_babel
