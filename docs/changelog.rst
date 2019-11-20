@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.1 (2019-11-21)
+~~~~~~~~~~~~~~~~~~
+
+-  Restore support for Sphinx 1.5 (and possibly earlier).
+
 0.2.0 (2019-11-20)
 ~~~~~~~~~~~~~~~~~~
 

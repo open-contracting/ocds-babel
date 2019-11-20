@@ -1,5 +1,7 @@
 import logging
+from contextlib import contextmanager
 
+import sphinx
 from docutils.frontend import OptionParser
 from docutils.io import InputError
 from docutils.parsers.rst import Parser, directives
@@ -7,10 +9,18 @@ from docutils.utils import new_document, SystemMessage
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 from sphinx.application import Sphinx
-from sphinx.util.docutils import docutils_namespace, patch_docutils
+from sphinx.util.docutils import docutils_namespace
 
 from ocds_babel.directives import NullDirective
 from ocds_babel.markdown_translator import MarkdownTranslator
+
+# patch_docutils is added in Sphinx 1.6.
+if sphinx.version_info >= (1, 6):
+    from sphinx.util.docutils import patch_docutils
+else:
+    @contextmanager
+    def patch_docutils(confdir=None):
+        yield
 
 logger = logging.getLogger('ocds_babel')
 
