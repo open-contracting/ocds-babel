@@ -10,8 +10,8 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 
 -  Translate images and HTML.
--  Add support for Sphinx>=1.6 (requires forks of recommonmark and commonmark with bugfixes for now).
--  **Backwards-incompatible change:** Remove support for Sphinx<1.6.
+-  Add support for Sphinx>=1.6 (requires forks of recommonmark and commonmark for now).
+-  **Backwards-incompatible change:** Remove support for Sphinx<1.6 (restored in 0.2.1).
 
 0.1.0 (2019-05-23)
 ~~~~~~~~~~~~~~~~~~
