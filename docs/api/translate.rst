@@ -40,7 +40,7 @@ Methods are also available for translating ``extension.json`` and for translatin
 Install requirements for Markdown translation
 ---------------------------------------------
 
-To translate Markdown files, you must install Sphinx>=1.6 and (for now) forks of `CommonMark <https://commonmarkpy.readthedocs.io/en/latest/>`__ and `recommonmark <https://recommonmark.readthedocs.io/en/latest/>`__.
+To translate Markdown files, you must install Sphinx>=1.6 and (for now) forks of `CommonMark <https://commonmarkpy.readthedocs.io/en/latest/>`__ and `recommonmark <https://recommonmark.readthedocs.io/en/latest/>`__, until these bugs are fixed: `#225 <https://github.com/readthedocs/commonmark.py/pull/225>`__, `#181 <https://github.com/readthedocs/recommonmark/pull/181>`__, `#186 <https://github.com/readthedocs/recommonmark/pull/186>`__, `#187 <https://github.com/readthedocs/recommonmark/pull/187>`__.
 
 Install a recent version of Sphinx with:
 
