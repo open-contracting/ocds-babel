@@ -1,7 +1,7 @@
 import os
 from tempfile import TemporaryDirectory
 
-from ocds_babel.extract import extract_codelist, extract_schema, extract_extension_metadata
+from ocds_babel.extract import extract_codelist, extract_extension_metadata, extract_schema
 
 options = {
     'headers': 'Title,Description,Extension',

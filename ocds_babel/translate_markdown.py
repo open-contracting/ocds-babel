@@ -5,7 +5,7 @@ import sphinx
 from docutils.frontend import OptionParser
 from docutils.io import InputError
 from docutils.parsers.rst import Parser, directives
-from docutils.utils import new_document, SystemMessage
+from docutils.utils import SystemMessage, new_document
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 from sphinx.application import Sphinx
