@@ -3,7 +3,6 @@ import gettext
 import json
 import logging
 import os
-from collections import OrderedDict
 from copy import deepcopy
 from io import StringIO
 
@@ -94,7 +93,7 @@ def translate_schema(io, translator, **kwargs):
     """
     Accepts a JSON file as an IO object, and returns its translated contents in JSON format.
     """
-    data = _json_load(io)
+    data = json.load(io)
 
     data = translate_schema_data(data, translator, **kwargs)
 
@@ -128,7 +127,7 @@ def translate_extension_metadata(io, translator, lang='en', **kwargs):
     """
     Accepts an extension metadata file as an IO object, and returns its translated contents in JSON format.
     """
-    data = _json_load(io)
+    data = json.load(io)
 
     data = translate_extension_metadata_data(data, translator, lang, **kwargs)
 
@@ -152,10 +151,6 @@ def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
             data[key] = {lang: translator.gettext(text)}
 
     return data
-
-
-def _json_load(io):
-    return json.load(io, object_pairs_hook=OrderedDict)
 
 
 def _json_dumps(data):
