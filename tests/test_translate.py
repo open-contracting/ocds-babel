@@ -116,6 +116,9 @@ This is <em>inline HTML</em>.
     * - Before ``Code`` After
       - Before `Link <http://example.com>`__ After
 ```
+
+* [Link list item 1](http://example.com/en/1.html)
+* [Link list item 2](http://example.com/en/2.html)
 """
 
 
@@ -308,6 +311,8 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Before **Header 2** After': 'Avant **En-tête 2** Après',
                 'Before ``Code`` After': 'Avant ``Code`` Après',
                 'Before `Link <http://example.com>`__ After': 'Avant `Lien <http://example.com>`__ Après',
+                '[Link list item 1](http://example.com/en/1.html)': '[Élément de liste de liens 1](http://example.com/fr/1.html)',
+                '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',
                 # docutils ... optparse
                 '%prog [options]': '%prog [options]',
             }[args[0]]
@@ -395,6 +400,9 @@ Ceci est <em>HTML en ligne</em>.
 </tr>
 </tbody>
 </table>
+
+* [Élément de liste de liens 1](http://example.com/fr/1.html)
+* [Élément de liste de liens 2](http://example.com/fr/2.html)
 """
 
     assert len(caplog.records) == 1
