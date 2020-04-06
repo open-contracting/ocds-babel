@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.2 (2020-04-06)
+~~~~~~~~~~~~~~~~~~
+
+-  Don't attempt to convert lists of links into ``toctree`` directives.
+
 0.2.1 (2019-11-21)
 ~~~~~~~~~~~~~~~~~~
 

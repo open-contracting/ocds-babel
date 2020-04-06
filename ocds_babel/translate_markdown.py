@@ -45,9 +45,11 @@ def translate_markdown_data(name, text, translator, **kwargs):
 
     with patch_docutils(), docutils_namespace():
         # sphinx-build -b html -q -E …
+        # See build_main() in sphinx/cmd/build.py
         app = Sphinx('.', None, 'outdir', '.', 'html', status=None, freshenv=True)
-        # Avoid "recommonmark_config not setted, proceed default setting".
-        app.add_config_value('recommonmark_config', {}, True)
+        app.add_config_value('recommonmark_config', {
+            'enable_auto_toc_tree': False,
+        }, True)
 
         # From code comment in `new_document`.
         settings = OptionParser(components=(Parser,)).get_default_values()
