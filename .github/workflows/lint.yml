@@ -16,6 +16,16 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('.github/workflows/lint.yml') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - run: curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
-    - run: pip install .
-    - run: curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
+    # Need to install editable projects in a venv for isort to detect.
+    - name: Install
+      run: |
+        python -m venv venv
+        . venv/bin/activate
+        curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
+        pip install .[markdown]
+        pip install -e git+https://github.com/readthedocs/commonmark.py.git@dafae75015cc342f3fddb499674bab97ac4a6a96#egg=commonmark
+        pip install -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
+    - name: Lint
+      run: |
+        . venv/bin/activate
+        curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
