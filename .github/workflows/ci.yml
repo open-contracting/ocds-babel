@@ -10,7 +10,7 @@ jobs:
         # Tox: "OSError: [WinError 193] %1 is not a valid Win32 application"
         exclude:
           - os: windows-latest
-          - python-version: 3.8
+            python-version: 3.8
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v1
