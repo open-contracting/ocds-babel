@@ -1,0 +1,24 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v1
+      with:
+        path: .tox
+        key: ${{ runner.os }}-tox-${{ hashFiles('**/setup.py') }}
+        restore-keys: |
+          ${{ runner.os }}-tox-
+    - run: pip install tox
+    - env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: tox -e clean,py-sphinx{15,16,17,18,20,21,22},report
