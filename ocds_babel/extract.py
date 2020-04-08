@@ -30,7 +30,7 @@ import json
 import os
 from io import StringIO
 
-from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS  # noqa: E501
+from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS
 from ocds_babel.util import text_to_translate
 
 

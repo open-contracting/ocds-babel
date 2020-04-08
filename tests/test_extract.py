@@ -13,7 +13,7 @@ codelist = b"""Code,Title,Description,Extension,Category
   bar  ,       ,  bzz  ,  zzz  ,  foo  
   baz  ,  bzz  ,       ,  foo  ,  bar  
   bzz  ,  zzz  ,  foo  ,       ,  baz  
-"""  # noqa
+"""  # noqa: W291
 
 schema = b"""{
     "title": {

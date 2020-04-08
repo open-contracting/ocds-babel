@@ -57,7 +57,7 @@ Then, install the forks of CommonMark and recommonmark:
 .. code-block:: bash
 
     pip install -e git+https://github.com/readthedocs/commonmark.py.git@dafae75015cc342f3fddb499674bab97ac4a6a96#egg=commonmark -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
-"""  # noqa
+"""  # noqa: E501
 
 import csv
 import gettext
@@ -67,11 +67,11 @@ import os
 from copy import deepcopy
 from io import StringIO
 
-from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS  # noqa: E501
+from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS
 from ocds_babel.util import text_to_translate
 
 try:
-    from ocds_babel.translate_markdown import translate_markdown, translate_markdown_data  # noqa
+    from ocds_babel.translate_markdown import translate_markdown
 except ImportError:
     pass
 

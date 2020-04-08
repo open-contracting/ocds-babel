@@ -13,7 +13,7 @@ headers = ['Title', 'Description', 'Extension']
 codelist = """Code,Title,Description
 open,  Open  ,  All interested suppliers may submit a tender.  
 selective,  Selective  ,  Only qualified suppliers are invited to submit a tender.  
-"""  # noqa
+"""  # noqa: W291
 
 schema = """{
   "title": "Schema for an Open Contracting Record package {{version}} [{{lang}}]",
@@ -134,8 +134,8 @@ def test_translate_codelists(monkeypatch, caplog):
                 'Description': 'Descripción',
                 'Open': 'Abierta',
                 'Selective': 'Selectiva',
-                'All interested suppliers may submit a tender.': 'Todos los proveedores interesados pueden enviar una propuesta.',  # noqa
-                'Only qualified suppliers are invited to submit a tender.': 'Sólo los proveedores calificados son invitados a enviar una propuesta.',  # noqa
+                'All interested suppliers may submit a tender.': 'Todos los proveedores interesados pueden enviar una propuesta.',  # noqa: E501
+                'Only qualified suppliers are invited to submit a tender.': 'Sólo los proveedores calificados son invitados a enviar una propuesta.',  # noqa: E501
             }[args[0]]
 
     monkeypatch.setattr(gettext, 'translation', Translation)
@@ -176,14 +176,14 @@ def test_translate_schema(monkeypatch, caplog):
 
         def gettext(self, *args, **kwargs):
             return {
-                'Schema for an Open Contracting Record package {{version}} [{{lang}}]': 'Esquema para un paquete de Registros de Contrataciones Abiertas {{version}} [{{lang}}]',  # noqa
-                'The record package contains a list of records along with some publishing…':  'El paquete de registros contiene una lista de registros junto con algunos…',  # noqa
+                'Schema for an Open Contracting Record package {{version}} [{{lang}}]': 'Esquema para un paquete de Registros de Contrataciones Abiertas {{version}} [{{lang}}]',  # noqa: E501
+                'The record package contains a list of records along with some publishing…':  'El paquete de registros contiene una lista de registros junto con algunos…',  # noqa: E501
                 'Releases': 'Entregas',
                 'An array of linking identifiers or releases': 'Una matriz de enlaces a identificadores o entregas',
                 'Linked releases': 'Entregas vinculadas',
-                'A list of objects that identify the releases associated with this Open…':  'Una lista de objetos que identifican las entregas asociadas con este Open…',  # noqa
+                'A list of objects that identify the releases associated with this Open…':  'Una lista de objetos que identifican las entregas asociadas con este Open…',  # noqa: E501
                 'Embedded releases': 'Entregas embebidas',
-                'A list of releases, with all the data. The releases MUST be sorted into date…':  'Una lista de entregas, con todos los datos. Las entregas DEBEN ordenarse…',  # noqa
+                'A list of releases, with all the data. The releases MUST be sorted into date…':  'Una lista de entregas, con todos los datos. Las entregas DEBEN ordenarse…',  # noqa: E501
             }[args[0]]
 
     monkeypatch.setattr(gettext, 'translation', Translation)
@@ -246,7 +246,7 @@ def test_translate_extension_metadata(monkeypatch, caplog):
             def gettext(self, *args, **kwargs):
                 return {
                     'Location': 'Ubicación',
-                    'Communicates the location of proposed or executed contract delivery.': 'Comunica la ubicación de la entrega del contrato propuesto o ejecutado.',  # noqa
+                    'Communicates the location of proposed or executed contract delivery.': 'Comunica la ubicación de la entrega del contrato propuesto o ejecutado.',  # noqa: E501
                 }[args[0]]
 
         monkeypatch.setattr(gettext, 'translation', Translation)
@@ -300,7 +300,7 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Blockquote text': 'Texte de citation',
                 '![Caption](http://example.com/example.png)': '![Légende](http://example.com/example-fr.png)',
                 'This is a [pending](examples/test.md) xref.': 'Ceci est un xref [en suspens](examples/test.md).',
-                'This is a **[bold link](http://example.com/test.md)**.': 'Ceci est un **[lien en gras](http://example.com/test.md)**.',  # noqa
+                'This is a **[bold link](http://example.com/test.md)**.': 'Ceci est un **[lien en gras](http://example.com/test.md)**.',  # noqa: E501
                 'This is <em>inline HTML</em>.': 'Ceci est <em>HTML en ligne</em>.',
                 '<h3>Subheading</h3>': '<h3>Sous-titre</h3>',
                 'Bulleted list item 1': 'Élément de liste à puces 1',
@@ -311,8 +311,8 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Before **Header 2** After': 'Avant **En-tête 2** Après',
                 'Before ``Code`` After': 'Avant ``Code`` Après',
                 'Before `Link <http://example.com>`__ After': 'Avant `Lien <http://example.com>`__ Après',
-                '[Link list item 1](http://example.com/en/1.html)': '[Élément de liste de liens 1](http://example.com/fr/1.html)',
-                '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',
+                '[Link list item 1](http://example.com/en/1.html)': '[Élément de liste de liens 1](http://example.com/fr/1.html)',  # noqa: E501
+                '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',  # noqa: E501
                 # docutils ... optparse
                 '%prog [options]': '%prog [options]',
             }[args[0]]
