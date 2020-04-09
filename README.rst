@@ -1,4 +1,4 @@
-|PyPI Version| |Build Status| |Coverage Status| |Python Version|
+|PyPI Version| |Build Status| |Lint Status| |Coverage Status| |Python Version|
 
 This Python package provides `Babel extractors <http://babel.pocoo.org/en/latest/messages.html>`__ and translation methods for standards like:
 
@@ -11,8 +11,8 @@ If you are viewing this on GitHub or PyPi, open the `full documentation <https:/
 
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/ocds-babel.svg
    :target: https://pypi.org/project/ocds-babel/
-.. |Build Status| image:: https://secure.travis-ci.org/open-contracting/ocds-babel.png
-   :target: https://travis-ci.org/open-contracting/ocds-babel
+.. |Build Status| image:: https://github.com/open-contracting/ocds-merge/workflows/CI/badge.svg
+.. |Lint Status| image:: https://github.com/open-contracting/ocds-merge/workflows/Lint/badge.svg
 .. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/ocds-babel/badge.png?branch=master
    :target: https://coveralls.io/github/open-contracting/ocds-babel?branch=master
 .. |Python Version| image:: https://img.shields.io/pypi/pyversions/ocds-babel.svg
