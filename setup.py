@@ -18,7 +18,7 @@ setup(
             'docutils',
             # See https://ocds-babel.readthedocs.io/en/latest/api/translate.html
             # 'recommonmark',
-            'Sphinx>=1.6',
+            'Sphinx>=1.5',
         ],
         'test': [
             'pytest',
