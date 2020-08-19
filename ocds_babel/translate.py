@@ -90,9 +90,8 @@ def translate(configuration, localedir, language, headers, **kwargs):
     for sources, target, domain in configuration:
         logger.info('Translating to {} using "{}" domain, into {}'.format(language, domain, target))
 
-        if domain not in translators:
-            translators[domain] = gettext.translation(
-                domain, localedir, languages=[language], fallback=language == 'en')
+        translators.setdefault(domain, gettext.translation(
+            domain, localedir, languages=[language], fallback=language == 'en'))
 
         os.makedirs(target, exist_ok=True)
 
