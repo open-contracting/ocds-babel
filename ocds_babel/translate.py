@@ -214,4 +214,4 @@ def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
 
 
 def _json_dumps(data):
-    return json.dumps(data, ensure_ascii=False, indent=2, separators=(',', ': '))
+    return json.dumps(data, ensure_ascii=False, indent=2)
