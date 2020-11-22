@@ -1,6 +1,6 @@
+/*.egg-info
 /.coverage
 /.tox
-/*.egg-info
-/build
 /dist
 /docs/_build
+/htmlcov
