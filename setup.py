@@ -17,7 +17,6 @@ setup(
         'markdown': [
             'docutils',
             'MyST-Parser>=0.13.4',
-            'Sphinx>=1.5',
         ],
         'test': [
             'pytest',

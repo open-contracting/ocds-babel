@@ -86,11 +86,6 @@ Literal block
 }
 ```
 
-```eval_rst
-.. extensiontable::
-   :extension: location
-```
-
 <h3>Subheading</h3>
 
 ![Caption](http://example.com/example.png)
@@ -360,11 +355,6 @@ Literal block
 {
     "json": "block"
 }
-```
-
-```eval_rst
-.. extensiontable::
-   :extension: location
 ```
 
 <h3>Sous-titre</h3>
