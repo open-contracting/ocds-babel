@@ -4,13 +4,13 @@ skippable = (
     'visit_document',
     'depart_colspec',
     'depart_list_item',
-    'depart_section',
     # Handled instead via `colspec` nodes.
     'depart_tgroup',
     'visit_tgroup',
     # Inline node
     'depart_emphasis',
     'depart_image',
+    'depart_inline',
     'depart_literal',
     'depart_pending_xref',
     'depart_raw',
@@ -18,9 +18,9 @@ skippable = (
     'depart_strong',
     'visit_emphasis',
     'visit_image',
+    'visit_inline',
     'visit_literal',
     'visit_pending_xref',
-    'visit_raw',
     'visit_reference',
     'visit_strong',
     # Text node
@@ -36,6 +36,7 @@ class MarkdownTranslator(nodes.NodeVisitor):
         # Whether we are writing to the output.
         self.writing = True
 
+        self.heading_level = 0
         # The writing context: 'block-quote', 'td' or 'th'.
         self.contexts = [None]
         # List item markers: '*' or '1.'.
@@ -116,7 +117,7 @@ class MarkdownTranslator(nodes.NodeVisitor):
                 self.append('\n')
 
     def visit_literal_block(self, node):
-        self.append('```{}\n'.format(node.attributes.get('language', '')))
+        self.append('```{}\n'.format(node.get('language', '')))
         # Markdown code blocks (indented paragraphs) have no `rawsource`, but fenced code blocks do.
         if node.rawsource:
             text = node.rawsource
@@ -130,13 +131,21 @@ class MarkdownTranslator(nodes.NodeVisitor):
         self.append('```\n\n')
 
     def visit_section(self, node):
-        self.append('#' * node.attributes['level'] + ' ')
+        self.heading_level += 1
+        self.append('#' * self.heading_level + ' ')
+
+    def depart_section(self, node):
+        self.heading_level -= 1
 
     def visit_title(self, node):
         self.append(self.gettext(node.rawsource))
 
     def depart_title(self, node):
         self.append('\n\n')
+
+    def visit_raw(self, node):
+        if isinstance(node.parent, nodes.section):
+            self.append(self.gettext(node.astext()) + '\n\n')
 
     # Lists
 

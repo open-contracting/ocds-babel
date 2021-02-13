@@ -23,8 +23,6 @@ jobs:
         . $GITHUB_WORKSPACE/../venv/bin/activate
         curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
         pip install .[markdown]
-        pip install -e git+https://github.com/readthedocs/commonmark.py.git@dafae75015cc342f3fddb499674bab97ac4a6a96#egg=commonmark
-        pip install -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
     - name: Lint
       run: |
         . $GITHUB_WORKSPACE/../venv/bin/activate

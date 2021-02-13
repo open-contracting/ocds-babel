@@ -107,7 +107,7 @@ This is <em>inline HTML</em>.
 1. Enumerated list item 1
 2. Enumerated list item 2
 
-```eval_rst
+```{eval-rst}
 .. list-table::
     :header-rows: 1
 
@@ -315,6 +315,7 @@ def test_translate_markdown(monkeypatch, caplog):
                 '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',  # noqa: E501
                 # docutils ... optparse
                 '%prog [options]': '%prog [options]',
+                '': '',
             }[args[0]]
 
     monkeypatch.setattr(gettext, 'translation', Translation)
@@ -333,7 +334,7 @@ def test_translate_markdown(monkeypatch, caplog):
             with open(os.path.join(builddir, 'README.md')) as f:
                 text = f.read()
 
-    assert text == """##### Entête à sauter
+    assert text == """# Entête à sauter
 
 # Titre 1
 
@@ -347,11 +348,11 @@ Texte de paragraphe et ```texte littéral```
 
 > Texte de citation
 
-```
+```none
 Raw paragraph text
 ```
 
-```
+```default
 Literal block
 ```
 
