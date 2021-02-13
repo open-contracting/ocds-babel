@@ -16,7 +16,7 @@ setup(
     extras_require={
         'markdown': [
             'docutils',
-            'MyST-Parser',
+            'MyST-Parser>=0.13.4',
             'Sphinx>=1.5',
         ],
         'test': [
