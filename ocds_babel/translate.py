@@ -57,7 +57,7 @@ from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SC
 from ocds_babel.util import text_to_translate
 
 try:
-    from ocds_babel.translate_markdown import translate_markdown
+    from ocds_babel.translate_markdown import translate_markdown, translate_markdown_data  # noqa: F401
 except ImportError:
     pass
 

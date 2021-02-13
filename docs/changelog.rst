@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.3.0 (2021-02-12)
+0.3.0 (Unreleased)
 ~~~~~~~~~~~~~~~~~~
 
 -  Switch to MyST-Parser from recommonmark.
