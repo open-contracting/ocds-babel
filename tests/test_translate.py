@@ -291,14 +291,8 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Bulleted list item 2': 'Élément de liste à puces 2',
                 'Enumerated list item 1': 'Élément de liste énumérée 1',
                 'Enumerated list item 2': 'Élément de liste énumérée 2',
-                'Before *Header 1* After': 'Avant *En-tête 1* Après',
-                'Before **Header 2** After': 'Avant **En-tête 2** Après',
-                'Before ``Code`` After': 'Avant ``Code`` Après',
-                'Before `Link <http://example.com>`__ After': 'Avant `Lien <http://example.com>`__ Après',
                 '[Link list item 1](http://example.com/en/1.html)': '[Élément de liste de liens 1](http://example.com/fr/1.html)',  # noqa: E501
                 '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',  # noqa: E501
-                # docutils ... optparse
-                '%prog [options]': '%prog [options]',
             }[args[0]]
 
     monkeypatch.setattr(gettext, 'translation', Translation)
