@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.3.0 (Unreleased)
+0.3.0 (2021-02-15)
 ~~~~~~~~~~~~~~~~~~
 
 -  Switch to mdformat from recommonmark.
