@@ -16,7 +16,7 @@ setup(
     extras_require={
         'markdown': [
             'docutils',
-            'MyST-Parser>=0.13.5',
+            'mdformat',
         ],
         'test': [
             'pytest',

@@ -4,7 +4,13 @@ Changelog
 0.3.0 (Unreleased)
 ~~~~~~~~~~~~~~~~~~
 
--  Switch to MyST-Parser from recommonmark.
+-  Switch to mdformat from recommonmark.
+
+   -  HTML blocks are not translated.
+   -  Bullet lists use ``-`` bullets.
+   -  Code spans use single backticks.
+
+-  Drop support for Sphinx directives.
 
 0.2.2 (2020-04-06)
 ~~~~~~~~~~~~~~~~~~
