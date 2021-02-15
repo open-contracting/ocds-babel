@@ -102,16 +102,6 @@ This is <em>inline HTML</em>.
 1. Enumerated list item 1
 2. Enumerated list item 2
 
-```{eval-rst}
-.. list-table::
-    :header-rows: 1
-
-    * - Before *Header 1* After
-      - Before **Header 2** After
-    * - Before ``Code`` After
-      - Before `Link <http://example.com>`__ After
-```
-
 * [Link list item 1](http://example.com/en/1.html)
 * [Link list item 2](http://example.com/en/2.html)
 """
@@ -297,19 +287,12 @@ def test_translate_markdown(monkeypatch, caplog):
                 'This is a [pending](examples/test.md) xref.': 'Ceci est un xref [en suspens](examples/test.md).',
                 'This is a **[bold link](http://example.com/test.md)**.': 'Ceci est un **[lien en gras](http://example.com/test.md)**.',  # noqa: E501
                 'This is <em>inline HTML</em>.': 'Ceci est <em>HTML en ligne</em>.',
-                '<h3>Subheading</h3>': '<h3>Sous-titre</h3>',
                 'Bulleted list item 1': 'Élément de liste à puces 1',
                 'Bulleted list item 2': 'Élément de liste à puces 2',
                 'Enumerated list item 1': 'Élément de liste énumérée 1',
                 'Enumerated list item 2': 'Élément de liste énumérée 2',
-                'Before *Header 1* After': 'Avant *En-tête 1* Après',
-                'Before **Header 2** After': 'Avant **En-tête 2** Après',
-                'Before ``Code`` After': 'Avant ``Code`` Après',
-                'Before `Link <http://example.com>`__ After': 'Avant `Lien <http://example.com>`__ Après',
                 '[Link list item 1](http://example.com/en/1.html)': '[Élément de liste de liens 1](http://example.com/fr/1.html)',  # noqa: E501
                 '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',  # noqa: E501
-                # docutils ... optparse
-                '%prog [options]': '%prog [options]',
                 '': '',
             }[args[0]]
 
@@ -329,7 +312,7 @@ def test_translate_markdown(monkeypatch, caplog):
             with open(os.path.join(builddir, 'README.md')) as f:
                 text = f.read()
 
-    assert text == """# Entête à sauter
+    assert text == """##### Entête à sauter
 
 # Titre 1
 
@@ -337,17 +320,17 @@ def test_translate_markdown(monkeypatch, caplog):
 
 ### Titre **3**
 
-Texte de paragraphe et ```texte littéral```
+Texte de paragraphe et `texte littéral`
 
 `Texte littéral`
 
 > Texte de citation
 
-```none
+```
 Raw paragraph text
 ```
 
-```default
+```
 Literal block
 ```
 
@@ -357,7 +340,7 @@ Literal block
 }
 ```
 
-<h3>Sous-titre</h3>
+<h3>Subheading</h3>
 
 ![Légende](http://example.com/example-fr.png)
 
@@ -367,33 +350,14 @@ Ceci est un **[lien en gras](http://example.com/test.md)**.
 
 Ceci est <em>HTML en ligne</em>.
 
-* Élément de liste à puces 1
-* Élément de liste à puces 2
+- Élément de liste à puces 1
+- Élément de liste à puces 2
 
 1. Élément de liste énumérée 1
 1. Élément de liste énumérée 2
 
-<table border="1" class="docutils">
-<colgroup>
-<col width="50%" />
-<col width="50%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd">
-<th class="head">Avant <em>En-tête 1</em> Après</th>
-<th class="head">Avant <strong>En-tête 2</strong> Après</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even">
-<td>Avant <tt class="docutils literal">Code</tt> Après</td>
-<td>Avant <a class="reference external" href="http://example.com">Lien</a> Après</td>
-</tr>
-</tbody>
-</table>
-
-* [Élément de liste de liens 1](http://example.com/fr/1.html)
-* [Élément de liste de liens 2](http://example.com/fr/2.html)
+- [Élément de liste de liens 1](http://example.com/fr/1.html)
+- [Élément de liste de liens 2](http://example.com/fr/2.html)
 """
 
     assert len(caplog.records) == 1

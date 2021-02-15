@@ -15,8 +15,8 @@ setup(
     long_description=long_description,
     extras_require={
         'markdown': [
-            'docutils',
-            'MyST-Parser>=0.13.5',
+            'markdown-it-py',
+            'mdformat',
         ],
         'test': [
             'pytest',
