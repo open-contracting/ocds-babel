@@ -38,25 +38,11 @@ Methods are also available for translating ``extension.json`` and for translatin
 Install requirements for Markdown translation
 ---------------------------------------------
 
-To translate Markdown files, you must install Sphinx>=1.5 and (for now) forks of `CommonMark <https://commonmarkpy.readthedocs.io/en/latest/>`__ and `recommonmark <https://recommonmark.readthedocs.io/en/latest/>`__, until these bugs are fixed: `#225 <https://github.com/readthedocs/commonmark.py/pull/225>`__, `#181 <https://github.com/readthedocs/recommonmark/pull/181>`__, `#186 <https://github.com/readthedocs/recommonmark/pull/186>`__, `#187 <https://github.com/readthedocs/recommonmark/pull/187>`__.
-
-Install a recent version of Sphinx with:
+To translate Markdown files, you must install:
 
 .. code-block:: bash
 
     pip install ocds-babel[markdown]
-
-or install a specific version like:
-
-.. code-block:: bash
-
-    pip install 'Sphinx==2.2.1'
-
-Then, install the forks of CommonMark and recommonmark:
-
-.. code-block:: bash
-
-    pip install -e git+https://github.com/readthedocs/commonmark.py.git@dafae75015cc342f3fddb499674bab97ac4a6a96#egg=commonmark -e git+https://github.com/jpmckinney/recommonmark.git@hotfix#egg=recommonmark
 """  # noqa: E501
 
 import csv
@@ -71,7 +57,7 @@ from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SC
 from ocds_babel.util import text_to_translate
 
 try:
-    from ocds_babel.translate_markdown import translate_markdown
+    from ocds_babel.translate_markdown import translate_markdown, translate_markdown_data  # noqa: F401
 except ImportError:
     pass
 

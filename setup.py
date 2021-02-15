@@ -16,9 +16,7 @@ setup(
     extras_require={
         'markdown': [
             'docutils',
-            # See https://ocds-babel.readthedocs.io/en/latest/api/translate.html
-            # 'recommonmark',
-            'Sphinx>=1.5',
+            'MyST-Parser>=0.13.5',
         ],
         'test': [
             'pytest',
