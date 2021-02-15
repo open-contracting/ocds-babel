@@ -15,7 +15,6 @@ setup(
     long_description=long_description,
     extras_require={
         'markdown': [
-            'docutils',
             'mdformat',
         ],
         'test': [
