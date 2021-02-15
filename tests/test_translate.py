@@ -280,7 +280,7 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Heading 1': 'Titre 1',
                 'Heading 2': 'Titre 2',
                 'Heading **3**': 'Titre **3**',
-                'Paragraph text and `literal text`': 'Texte de paragraphe et `texte littéral`',
+                'Paragraph text and ```literal text```': 'Texte de paragraphe et ```texte littéral```',
                 '`Literal text`': '`Texte littéral`',
                 'Blockquote text': 'Texte de citation',
                 '![Caption](http://example.com/example.png)': '![Légende](http://example.com/example-fr.png)',
@@ -293,6 +293,7 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Enumerated list item 2': 'Élément de liste énumérée 2',
                 '[Link list item 1](http://example.com/en/1.html)': '[Élément de liste de liens 1](http://example.com/fr/1.html)',  # noqa: E501
                 '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',  # noqa: E501
+                '': '',
             }[args[0]]
 
     monkeypatch.setattr(gettext, 'translation', Translation)

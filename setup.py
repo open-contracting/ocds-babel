@@ -15,6 +15,7 @@ setup(
     long_description=long_description,
     extras_require={
         'markdown': [
+            'markdown-it-py',
             'mdformat',
         ],
         'test': [
