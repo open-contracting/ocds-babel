@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.3.1 (2021-02-16)
+~~~~~~~~~~~~~~~~~~
+
+-  Set the Markdown level of translated content.
+
 0.3.0 (2021-02-15)
 ~~~~~~~~~~~~~~~~~~
 
