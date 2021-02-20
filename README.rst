@@ -13,7 +13,7 @@ If you are viewing this on GitHub or PyPi, open the `full documentation <https:/
    :target: https://pypi.org/project/ocds-babel/
 .. |Build Status| image:: https://github.com/open-contracting/ocds-babel/workflows/CI/badge.svg
 .. |Lint Status| image:: https://github.com/open-contracting/ocds-babel/workflows/Lint/badge.svg
-.. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/ocds-babel/badge.png?branch=master
-   :target: https://coveralls.io/github/open-contracting/ocds-babel?branch=master
+.. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/ocds-babel/badge.svg?branch=main
+   :target: https://coveralls.io/github/open-contracting/ocds-babel?branch=main
 .. |Python Version| image:: https://img.shields.io/pypi/pyversions/ocds-babel.svg
    :target: https://pypi.org/project/ocds-babel/
