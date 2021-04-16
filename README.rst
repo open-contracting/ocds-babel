@@ -7,7 +7,7 @@ This Python package provides `Babel extractors <http://babel.pocoo.org/en/latest
 * Beneficial Ownership Data Standard (BODS)
 * Social Investment Data Lab Specification (SEDL)
 
-If you are viewing this on GitHub or PyPi, open the `full documentation <https://ocds-babel.readthedocs.io/>`__ for additional details.
+If you are viewing this on GitHub or PyPI, open the `full documentation <https://ocds-babel.readthedocs.io/>`__ for additional details.
 
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/ocds-babel.svg
    :target: https://pypi.org/project/ocds-babel/
