@@ -11,7 +11,7 @@ In the Sphinx build configuration file (``conf.py``), you can use :code:`transla
 
 
     def setup(app):
-        basedir = Path(os.path.realpath(__file__)).parents[1]
+        basedir = Path(__file__).resolve().parents[1]
         localedir = basedir / 'locale'
         language = app.config.overrides.get('language', 'en')
         headers = ['Title', 'Description', 'Extension']
