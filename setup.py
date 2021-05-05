@@ -16,7 +16,7 @@ setup(
     long_description_content_type='text/x-rst',
     extras_require={
         'markdown': [
-            'markdown-it-py<1',
+            'markdown-it-py',
             'mdformat',
         ],
         'test': [

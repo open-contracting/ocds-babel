@@ -1,4 +1,5 @@
-from markdown_it.main import AttrDict, MarkdownIt
+from markdown_it.main import MarkdownIt
+from markdown_it.utils import AttrDict
 from mdformat.renderer import MDRenderer
 
 
