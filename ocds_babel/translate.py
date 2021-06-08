@@ -74,7 +74,7 @@ def translate(configuration, localedir, language, headers, **kwargs):
     translators = {}
 
     for sources, target, domain in configuration:
-        logger.info('Translating to {} using "{}" domain, into {}'.format(language, domain, target))
+        logger.info(f'Translating to {language} using "{domain}" domain, into {target}')
 
         translators.setdefault(domain, gettext.translation(
             domain, localedir, languages=[language], fallback=language == 'en'))

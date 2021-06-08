@@ -62,13 +62,13 @@ def extract_schema(fileobj, keywords, comment_tags, options):
     def _extract_schema(data, pointer=''):
         if isinstance(data, list):
             for index, item in enumerate(data):
-                yield from _extract_schema(item, pointer='{}/{}'.format(pointer, index))
+                yield from _extract_schema(item, pointer=f'{pointer}/{index}')
         elif isinstance(data, dict):
             for key, value in data.items():
-                yield from _extract_schema(value, pointer='{}/{}'.format(pointer, key))
+                yield from _extract_schema(value, pointer=f'{pointer}/{key}')
                 text = text_to_translate(value, key in TRANSLATABLE_SCHEMA_KEYWORDS)
                 if text:
-                    yield text, '{}/{}'.format(pointer, key)
+                    yield text, f'{pointer}/{key}'
 
     data = json.loads(fileobj.read().decode())
     for text, pointer in _extract_schema(data):
@@ -84,11 +84,11 @@ def extract_extension_metadata(fileobj, keywords, comment_tags, options):
         value = data.get(key)
 
         if isinstance(value, dict):
-            comment = '/{}/en'.format(key)
+            comment = f'/{key}/en'
             value = value.get('en')
         else:
             # old extension.json format
-            comment = '/{}'.format(key)
+            comment = f'/{key}'
 
         text = text_to_translate(value)
         if text:

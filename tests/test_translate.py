@@ -151,7 +151,7 @@ def test_translate_codelists(monkeypatch, caplog):
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating to es using "codelists" domain, into {}'.format(builddir)
+    assert caplog.records[0].message == f'Translating to es using "codelists" domain, into {builddir}'
 
 
 def test_translate_schema(monkeypatch, caplog):
@@ -219,7 +219,7 @@ def test_translate_schema(monkeypatch, caplog):
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating to es using "schema" domain, into {}'.format(builddir)
+    assert caplog.records[0].message == f'Translating to es using "schema" domain, into {builddir}'
 
 
 def test_translate_extension_metadata(monkeypatch, caplog):
@@ -264,7 +264,7 @@ def test_translate_extension_metadata(monkeypatch, caplog):
 
         assert len(caplog.records) == 1
         assert caplog.records[0].levelname == 'INFO'
-        assert caplog.records[0].message == 'Translating to es using "schema" domain, into {}'.format(builddir)
+        assert caplog.records[0].message == f'Translating to es using "schema" domain, into {builddir}'
 
         caplog.clear()
 
@@ -362,4 +362,4 @@ Ceci est <em>HTML en ligne</em>.
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == 'Translating to fr using "docs" domain, into {}'.format(builddir)
+    assert caplog.records[0].message == f'Translating to fr using "docs" domain, into {builddir}'
