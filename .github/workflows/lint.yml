@@ -19,7 +19,7 @@ jobs:
             ${{ runner.os }}-pip-
       - run: curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
       - run: curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
-      - run: pip install .[test]
+      - run: pip install .[markdown,test]
       - env:
           STANDARD_MAINTENANCE_SCRIPTS_EXTRAS: markdown
         run: pytest /tmp/test_requirements.py
