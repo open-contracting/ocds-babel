@@ -1,5 +1,4 @@
 from markdown_it.main import MarkdownIt
-from markdown_it.utils import AttrDict
 from mdformat.renderer import MDRenderer
 
 
@@ -18,7 +17,7 @@ def translate_markdown_data(name, md, translator, **kwargs):
     Accepts a Markdown file as its filename and contents, and returns its translated contents in Markdown format.
     """
     parser = MarkdownIt()
-    env = AttrDict()
+    env = {}
 
     tokens = []
     for token in parser.parse(md, env):
