@@ -1,10 +1,16 @@
 Changelog
 =========
 
+0.3.5 (2021-05-05)
+------------------
+
+-  Upgrade to markdown-it-py 2.x.
+-  Drop support for Python 3.6 (end-of-life 2021-12-23).
+
 0.3.4 (2021-05-05)
 ------------------
 
--  Add compatibility for markdown-it-py 1.x.
+-  Upgrade to markdown-it-py 1.x.
 
 0.3.3 (2021-05-05)
 ------------------
