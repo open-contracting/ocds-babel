@@ -20,7 +20,9 @@ setup(
             'mdformat',
         ],
         'test': [
+            'coveralls',
             'pytest',
+            'pytest-cov',
         ],
         'docs': [
             'furo',
