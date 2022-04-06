@@ -22,9 +22,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - run: pip install .[markdown,test]
-      - env:
-          PYTHONWARNINGS: error
-        run: pytest --cov ocds_babel
+      - run: pytest -W error --cov ocds_babel
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: coveralls --service=github
