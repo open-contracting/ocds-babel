@@ -17,7 +17,7 @@ setup(
     extras_require={
         'markdown': [
             'markdown-it-py>=2',
-            'mdformat',
+            'mdformat>=0.7.11',  # minimum for markdown-it-py>=2
         ],
         'test': [
             'coveralls',
