@@ -1,4 +1,4 @@
-from markdown_it.main import MarkdownIt
+from markdown_it import MarkdownIt
 from mdformat.renderer import MDRenderer
 
 
