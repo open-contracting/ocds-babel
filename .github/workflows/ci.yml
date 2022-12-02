@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: setup.py
+          cache-dependency-path: setup.cfg
       - run: pip install .[markdown,test]
       - run: pytest -W error --cov ocds_babel
       - env:
