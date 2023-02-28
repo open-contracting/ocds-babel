@@ -108,7 +108,7 @@ This is <em>inline HTML</em>.
 
 
 def test_translate_codelists(monkeypatch, caplog):
-    class Translation(object):
+    class Translation:
         def __init__(self, *args, **kwargs):
             pass
 
@@ -155,7 +155,7 @@ def test_translate_codelists(monkeypatch, caplog):
 
 
 def test_translate_schema(monkeypatch, caplog):
-    class Translation(object):
+    class Translation:
         def __init__(self, *args, **kwargs):
             pass
 
@@ -224,7 +224,7 @@ def test_translate_schema(monkeypatch, caplog):
 
 def test_translate_extension_metadata(monkeypatch, caplog):
     for metadata in (extension_metadata, extension_metadata_language_map):
-        class Translation(object):
+        class Translation:
             def __init__(self, *args, **kwargs):
                 pass
 
@@ -270,7 +270,7 @@ def test_translate_extension_metadata(monkeypatch, caplog):
 
 
 def test_translate_markdown(monkeypatch, caplog):
-    class Translation(object):
+    class Translation:
         def __init__(self, *args, **kwargs):
             pass
 
