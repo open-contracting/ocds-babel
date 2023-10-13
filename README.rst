@@ -11,8 +11,8 @@ If you are viewing this on GitHub or PyPI, open the `full documentation <https:/
 
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/ocds-babel.svg
    :target: https://pypi.org/project/ocds-babel/
-.. |Build Status| image:: https://github.com/open-contracting/ocds-babel/workflows/CI/badge.svg
-   :target: https://github.com/open-contracting/ocds-babel/actions?query=workflow%3ACI
+.. |Build Status| image:: https://github.com/open-contracting/ocds-babel/actions/workflows/ci.yml
+   :target: https://github.com/open-contracting//actions/workflows/ci.yml
 .. |Coverage Status| image:: https://coveralls.io/repos/github/open-contracting/ocds-babel/badge.svg?branch=main
    :target: https://coveralls.io/github/open-contracting/ocds-babel?branch=main
 .. |Python Version| image:: https://img.shields.io/pypi/pyversions/ocds-babel.svg
