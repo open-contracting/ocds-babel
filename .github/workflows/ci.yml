@@ -16,7 +16,5 @@ jobs:
           cache: pip
           cache-dependency-path: setup.cfg
       - run: pip install .[markdown,test]
-      - run: pytest -W error --cov ocds_babel
-      - env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: coveralls --service=github
+      - run: coverage run --source=ocds_babel -m pytest -W error
+      - uses: coverallsapp/github-action@v2

@@ -1,3 +1,43 @@
 [build-system]
 requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "ocds-babel"
+version = "0.3.5"
+authors = [{name = "Open Contracting Partnership", email = "data@open-contracting.org"}]
+description = "Provides Babel extractors and translation methods for standards like OCDS or BODS"
+readme = "README.rst"
+license = {text = "BSD"}
+urls = {Homepage = "https://github.com/open-contracting/ocds-babel"}
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[project.optional-dependencies]
+markdown = [
+    "markdown-it-py>=2",
+    "mdformat>=0.7.11",
+]
+test = [
+    "coverage",
+    "pytest",
+]
+
+[project.entry-points."babel.extractors"]
+ocds_codelist = "ocds_babel.extract:extract_codelist"
+ocds_schema = "ocds_babel.extract:extract_schema"
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+    "tests.*",
+]
