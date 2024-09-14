@@ -112,7 +112,7 @@ def test_translate_codelists(monkeypatch, caplog):
         def __init__(self, *args, **kwargs):
             pass
 
-        def gettext(self, *args, **kwargs):
+        def gettext(self, *args, **_kwargs):
             return {
                 'Code': 'Código',
                 'Title': 'Título',
@@ -159,7 +159,7 @@ def test_translate_schema(monkeypatch, caplog):
         def __init__(self, *args, **kwargs):
             pass
 
-        def gettext(self, *args, **kwargs):
+        def gettext(self, *args, **_kwargs):
             return {
                 'Schema for an Open Contracting Record package {{version}} [{{lang}}]': 'Esquema para un paquete de Registros de Contrataciones Abiertas {{version}} [{{lang}}]',  # noqa: E501
                 'The record package contains a list of records along with some publishing…':  'El paquete de registros contiene una lista de registros junto con algunos…',  # noqa: E501
@@ -228,7 +228,7 @@ def test_translate_extension_metadata(monkeypatch, caplog):
             def __init__(self, *args, **kwargs):
                 pass
 
-            def gettext(self, *args, **kwargs):
+            def gettext(self, *args, **_kwargs):
                 return {
                     'Location': 'Ubicación',
                     'Communicates the location of proposed or executed contract delivery.': 'Comunica la ubicación de la entrega del contrato propuesto o ejecutado.',  # noqa: E501
@@ -274,7 +274,7 @@ def test_translate_markdown(monkeypatch, caplog):
         def __init__(self, *args, **kwargs):
             pass
 
-        def gettext(self, *args, **kwargs):
+        def gettext(self, *args, **_kwargs):
             return {
                 'Skip Heading': 'Entête à sauter',
                 'Heading 1': 'Titre 1',
