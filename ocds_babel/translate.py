@@ -57,7 +57,7 @@ from io import StringIO
 from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS
 from ocds_babel.util import text_to_translate
 
-with contextlib.supress(ImportError):
+with contextlib.suppress(ImportError):
     from ocds_babel.translate_markdown import translate_markdown, translate_markdown_data  # noqa: F401
 
 logger = logging.getLogger('ocds_babel')
