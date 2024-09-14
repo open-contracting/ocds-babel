@@ -285,14 +285,14 @@ def test_translate_markdown(monkeypatch, caplog):
                 'Blockquote text': 'Texte de citation',
                 '![Caption](http://example.com/example.png)': '![Légende](http://example.com/example-fr.png)',
                 'This is a [pending](examples/test.md) xref.': 'Ceci est un xref [en suspens](examples/test.md).',
-                'This is a **[bold link](http://example.com/test.md)**.': 'Ceci est un **[lien en gras](http://example.com/test.md)**.',  # noqa: E501
+                'This is a **[bold link](http://example.com/test.md)**.': 'Ceci est un **[lien en gras](http://example.com/test.md)**.',
                 'This is <em>inline HTML</em>.': 'Ceci est <em>HTML en ligne</em>.',
                 'Bulleted list item 1': 'Élément de liste à puces 1',
                 'Bulleted list item 2': 'Élément de liste à puces 2',
                 'Enumerated list item 1': 'Élément de liste énumérée 1',
                 'Enumerated list item 2': 'Élément de liste énumérée 2',
-                '[Link list item 1](http://example.com/en/1.html)': '[Élément de liste de liens 1](http://example.com/fr/1.html)',  # noqa: E501
-                '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',  # noqa: E501
+                '[Link list item 1](http://example.com/en/1.html)': '[Élément de liste de liens 1](http://example.com/fr/1.html)',
+                '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',
                 '': '',
             }[args[0]]
 

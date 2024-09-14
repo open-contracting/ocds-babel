@@ -45,6 +45,7 @@ To translate Markdown files, you must install:
     pip install ocds-babel[markdown]
 """  # noqa: E501
 
+import contextlib
 import csv
 import gettext
 import json
@@ -56,10 +57,8 @@ from io import StringIO
 from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS
 from ocds_babel.util import text_to_translate
 
-try:
+with contextlib.supress(ImportError):
     from ocds_babel.translate_markdown import translate_markdown, translate_markdown_data  # noqa: F401
-except ImportError:
-    pass
 
 logger = logging.getLogger('ocds_babel')
 
@@ -101,7 +100,7 @@ def translate(configuration, localedir, language, headers, **kwargs):
 
 
 # This should roughly match the logic of `extract_codelist`.
-def translate_codelist(io, translator, headers=[], **kwargs):
+def translate_codelist(io, translator, headers=(), **kwargs):
     """
     Accepts a CSV file as an IO object, and returns its translated contents in CSV format.
     """
@@ -118,7 +117,7 @@ def translate_codelist(io, translator, headers=[], **kwargs):
     return io.getvalue()
 
 
-def translate_codelist_data(source, translator, headers=[], **kwargs):
+def translate_codelist_data(source, translator, headers=(), **kwargs):
     """
     Accepts CSV rows as an iterable object (e.g. a list of dictionaries), and returns translated rows.
     """
