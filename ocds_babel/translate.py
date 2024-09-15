@@ -1,5 +1,5 @@
 """
-In the Sphinx build configuration file (``conf.py``), you can use :code:`translate` to translate codelist CSV files and JSON Schema files:
+In the Sphinx build configuration file (``conf.py``), ``translate`` codelist CSV files and JSON Schema files.
 
 .. code:: python
 
@@ -21,7 +21,8 @@ In the Sphinx build configuration file (``conf.py``), you can use :code:`transla
             (glob(str(basedir / 'schema' / 'codelists')), basedir / 'build' / language, 'codelists'),
         ], localedir, language, headers)
 
-:code:`translate` automatically determines the translation method to used based on filenames. The arguments to :code:`translate` are:
+:code:`translate` automatically determines the translation method to used based on filenames.
+The arguments to :code:`translate` are:
 
 #. A list of tuples. Each tuple has three values:
 
@@ -43,7 +44,7 @@ To translate Markdown files, you must install:
 .. code-block:: bash
 
     pip install ocds-babel[markdown]
-"""  # noqa: E501
+"""
 
 import contextlib
 import csv
@@ -65,9 +66,9 @@ logger = logging.getLogger('ocds_babel')
 
 def translate(configuration, localedir, language, headers, **kwargs):
     """
-    Writes files, translating any translatable strings.
+    Write files, translating any translatable strings.
 
-    For translated strings in schema files, replaces `{{lang}}` with the language code. Keyword arguments may specify
+    For translated strings in schema files, replace `{{lang}}` with the language code. Keyword arguments may specify
     additional replacements.
     """
     translators = {}
@@ -101,9 +102,7 @@ def translate(configuration, localedir, language, headers, **kwargs):
 
 # This should roughly match the logic of `extract_codelist`.
 def translate_codelist(io, translator, headers=(), **kwargs):
-    """
-    Accepts a CSV file as an IO object, and returns its translated contents in CSV format.
-    """
+    """Accept a CSV file as an IO object, and return its translated contents in CSV format."""
     reader = csv.DictReader(io)
 
     fieldnames = [translator.gettext(fieldname) for fieldname in reader.fieldnames]
@@ -118,9 +117,7 @@ def translate_codelist(io, translator, headers=(), **kwargs):
 
 
 def translate_codelist_data(source, translator, headers=(), **kwargs):
-    """
-    Accepts CSV rows as an iterable object (e.g. a list of dictionaries), and returns translated rows.
-    """
+    """Accept CSV rows as an iterable object (e.g. a list of dictionaries), and return translated rows."""
     rows = []
     for row in source:
         data = {}
@@ -135,9 +132,7 @@ def translate_codelist_data(source, translator, headers=(), **kwargs):
 
 # This should roughly match the logic of `extract_schema`.
 def translate_schema(io, translator, **kwargs):
-    """
-    Accepts a JSON file as an IO object, and returns its translated contents in JSON format.
-    """
+    """Accept a JSON file as an IO object, and return its translated contents in JSON format."""
     data = json.load(io)
 
     data = translate_schema_data(data, translator, **kwargs)
@@ -146,9 +141,7 @@ def translate_schema(io, translator, **kwargs):
 
 
 def translate_schema_data(source, translator, **kwargs):
-    """
-    Accepts JSON data, and returns translated data.
-    """
+    """Accept JSON data, and return translated data."""
     def _translate_schema_data(data):
         if isinstance(data, list):
             for item in data:
@@ -169,9 +162,7 @@ def translate_schema_data(source, translator, **kwargs):
 
 # This should roughly match the logic of `extract_extension_metadata`.
 def translate_extension_metadata(io, translator, lang='en', **kwargs):
-    """
-    Accepts an extension metadata file as an IO object, and returns its translated contents in JSON format.
-    """
+    """Accept an extension metadata file as an IO object, and return its translated contents in JSON format."""
     data = json.load(io)
 
     data = translate_extension_metadata_data(data, translator, lang, **kwargs)
@@ -180,9 +171,7 @@ def translate_extension_metadata(io, translator, lang='en', **kwargs):
 
 
 def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
-    """
-    Accepts extension metadata, and returns translated metadata.
-    """
+    """Accept extension metadata, and return translated metadata."""
     data = deepcopy(source)
 
     for key in TRANSLATABLE_EXTENSION_METADATA_KEYWORDS:

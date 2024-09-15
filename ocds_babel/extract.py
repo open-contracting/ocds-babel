@@ -35,9 +35,7 @@ from ocds_babel.util import text_to_translate
 
 
 def extract_codelist(fileobj, keywords, comment_tags, options):
-    """
-    Yields each header, and the specified field values of a codelist CSV file.
-    """
+    """Yield each header, and the specified field values of a codelist CSV file."""
     headers = _get_option_as_list(options, 'headers')
     ignore = _get_option_as_list(options, 'ignore')
 
@@ -56,9 +54,7 @@ def extract_codelist(fileobj, keywords, comment_tags, options):
 
 
 def extract_schema(fileobj, keywords, comment_tags, options):
-    """
-    Yields the "title" and "description" values of a JSON Schema file.
-    """
+    """Yield the "title" and "description" values of a JSON Schema file."""
     def _extract_schema(data, pointer=''):
         if isinstance(data, list):
             for index, item in enumerate(data):
@@ -76,9 +72,7 @@ def extract_schema(fileobj, keywords, comment_tags, options):
 
 
 def extract_extension_metadata(fileobj, keywords, comment_tags, options):
-    """
-    Yields the "name" and "description" values of an extension.json file.
-    """
+    """Yield the "name" and "description" values of an extension.json file."""
     data = json.loads(fileobj.read().decode())
     for key in TRANSLATABLE_EXTENSION_METADATA_KEYWORDS:
         value = data.get(key)
