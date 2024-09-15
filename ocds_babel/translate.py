@@ -123,9 +123,7 @@ def translate_codelist_data(source, translator, headers=(), **kwargs):
         data = {}
         for key, value in row.items():
             text = text_to_translate(value, key in headers)
-            if text:
-                value = translator.gettext(text)
-            data[translator.gettext(key)] = value
+            data[translator.gettext(key)] = translator.gettext(text) if text else value
         rows.append(data)
     return rows
 
