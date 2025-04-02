@@ -23,12 +23,21 @@ in ``babel_bods_codelist.cfg``, and::
     [ocds_schema: schema/*.json]
 
 in ``babel_bods_schema.cfg``.
+
+For OC4IDS, you can specify::
+
+    [oc4ids_sustainability_mapping: mapping/sustainability.yaml]
+    keys = title,disclosure format,mapping
+
+in ``babel_oc4ids_sustainability_mapping.cfg``.
 """
 
 import csv
 import json
 import os
 from io import StringIO
+
+import yaml
 
 from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS
 from ocds_babel.util import text_to_translate
@@ -87,6 +96,26 @@ def extract_extension_metadata(fileobj, keywords, comment_tags, options):
         text = text_to_translate(value)
         if text:
             yield 1, '', text, [comment]
+
+
+def extract_yaml(fileobj, keywords, comment_tags, options):
+    """Yield the values of the specified keys of a YAML file."""
+    keys = _get_option_as_list(options, 'keys')
+    def _extract_yaml(data, pointer=''):
+        if isinstance(data, list):
+            for index, item in enumerate(data):
+                yield from _extract_yaml(item, pointer=f'{pointer}/{index}')
+        elif isinstance(data, dict):
+            for key, value in data.items():
+                yield from _extract_yaml(value, pointer=f'{pointer}/{key}')
+                text = text_to_translate(value, key in keys)
+                if text:
+                    yield text, f'{pointer}/{key}'
+
+    data = yaml.safe_load(fileobj.read().decode())
+
+    for text, pointer in _extract_yaml(data):
+        yield 1, '', text, [pointer]
 
 
 def _get_option_as_list(options, key):
