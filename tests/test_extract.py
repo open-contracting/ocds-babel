@@ -1,7 +1,7 @@
 import os
 from tempfile import TemporaryDirectory
 
-from ocds_babel.extract import extract_codelist, extract_extension_metadata, extract_schema
+from ocds_babel.extract import extract_codelist, extract_extension_metadata, extract_schema, extract_yaml
 
 options = {
     'headers': 'Title,Description,Extension',
@@ -46,6 +46,17 @@ metadata = b"""{
     "description": "  bar  "
 }"""
 
+yaml_list = b"""
+-   id: '1'
+    title: foo
+-   id: '1'
+    mapping: bar
+"""
+
+yaml_obj = b"""
+foo: bar
+baz: bzz
+"""
 
 def assert_result(filename, content, method, options, expected):
     with TemporaryDirectory() as d:
@@ -123,3 +134,16 @@ def test_extract_extension_metadata_language_map():
 
 def test_extract_extension_metadata_empty():
     assert_result('extension.json', b'{}', extract_extension_metadata, None, [])
+
+
+def test_extract_yaml_list():
+    assert_result('test.yaml', yaml_list, extract_yaml, {"keys": "title,mapping"}, [
+        (1, '', 'foo', ['/0/title']),
+        (1, '', 'bar', ['/1/mapping']),
+    ])
+
+def test_extract_yaml_obj():
+    assert_result('test.yaml', yaml_obj, extract_yaml, {"keys": "foo,baz"}, [
+        (1, '', 'bar', ['/foo']),
+        (1, '', 'bzz', ['/baz']),
+    ])
