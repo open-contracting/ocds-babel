@@ -197,7 +197,7 @@ def translate_yaml(io, translator, keys=(), **kwargs):
 
     data = translate_yaml_data(data, translator, keys, **kwargs)
 
-    return yaml.safe_dump(data)
+    return yaml.safe_dump(data, default_flow_style=False, allow_unicode=True)
 
 
 def translate_yaml_data(source, translator, keys=(), **kwargs):
