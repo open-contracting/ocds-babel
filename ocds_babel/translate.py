@@ -76,12 +76,13 @@ with contextlib.suppress(ImportError):
 logger = logging.getLogger('ocds_babel')
 
 
-def translate(configuration, localedir, language, headers, keys, **kwargs):
+def translate(configuration, localedir, language, headers, keys=None, **kwargs):
     """
     Write files, translating any translatable strings.
 
-    For translated strings in schema files, replace `{{lang}}` with the language code. Keyword arguments may specify
-    additional replacements.
+    For translated strings in schema files, replace `{{lang}}` with the language code.
+
+    Keyword arguments may specify additional replacements.
     """
     translators = {}
 
@@ -95,24 +96,25 @@ def translate(configuration, localedir, language, headers, keys, **kwargs):
 
         for source in sources:
             basename = os.path.basename(source)
+            if basename == 'extension.json':
+                method = translate_extension_metadata
+                new_kwargs = {'lang': language}
+            elif source.endswith('.csv'):
+                method = translate_codelist
+                new_kwargs = {'headers': headers}
+            elif source.endswith('.json'):
+                method = translate_schema
+                new_kwargs = {'lang': language}
+            elif source.endswith('.md'):
+                method = translate_markdown
+                new_kwargs = {}
+            elif source.endswith('.yaml'):
+                method = translate_yaml
+                new_kwargs = {'keys': keys}
+            else:
+                raise NotImplementedError(basename)
             with open(source) as r, open(os.path.join(target, basename), 'w') as w:
-                if basename == 'extension.json':
-                    method = translate_extension_metadata
-                    kwargs.update(lang=language)
-                elif source.endswith('.csv'):
-                    method = translate_codelist
-                    kwargs.update(headers=headers)
-                elif source.endswith('.json'):
-                    method = translate_schema
-                    kwargs.update(lang=language)
-                elif source.endswith('.md'):
-                    method = translate_markdown
-                elif source.endswith('.yaml'):
-                    method = translate_yaml
-                    kwargs.update(keys=keys)
-                else:
-                    raise NotImplementedError(basename)
-                w.write(method(r, translators[domain], **kwargs))
+                w.write(method(r, translators[domain], **new_kwargs, **kwargs))
 
 
 # This should roughly match the logic of `extract_codelist`.
