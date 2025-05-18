@@ -14,11 +14,13 @@ from ocds_babel.translate import translate
 headers = ['Title', 'Description', 'Extension']
 
 
-def test_translate_codelists(monkeypatch, caplog):
-    class Translation:
-        def __init__(self, *args, **kwargs):
-            pass
+class Base:
+    def __init__(self, *args, **kwargs):
+        pass
 
+
+def test_translate_codelists(monkeypatch, caplog):
+    class Translation(Base):
         def gettext(self, *args, **kwargs):
             return {
                 'Code': 'Código',
@@ -70,10 +72,7 @@ def test_translate_codelists(monkeypatch, caplog):
 
 
 def test_translate_schema(monkeypatch, caplog):
-    class Translation:
-        def __init__(self, *args, **kwargs):
-            pass
-
+    class Translation(Base):
         def gettext(self, *args, **kwargs):
             return {
                 'Schema for an Open Contracting Record package {{version}} [{{lang}}]': 'Esquema para un paquete de Registros de Contrataciones Abiertas {{version}} [{{lang}}]',  # noqa: E501
@@ -230,10 +229,7 @@ def test_translate_extension_metadata(monkeypatch, caplog):
 
 
 def test_translate_markdown(monkeypatch, caplog):
-    class Translation:
-        def __init__(self, *args, **kwargs):
-            pass
-
+    class Translation(Base):
         def gettext(self, *args, **kwargs):
             return {
                 'Skip Heading': 'Entête à sauter',
@@ -375,10 +371,7 @@ Ceci est <em>HTML en ligne</em>.
 
 
 def test_translate_yaml(monkeypatch, caplog):
-    class Translation:
-        def __init__(self, *args, **kwargs):
-            pass
-
+    class Translation(Base):
         def gettext(self, *args, **kwargs):
             return {
                 "Procurement strategy": "Estrategia de adquisición",
@@ -389,7 +382,7 @@ def test_translate_yaml(monkeypatch, caplog):
                 "Project Level:\n\nAdd a [`CostMeasurement`](../../reference/schema.md#costmeasurement) object to the [`costMeasurements`](project-schema.json,,costMeasurements) array and map to its [`.lifeCycleCosting.value`](project-schema.json,/definitions/CostMeasurement,lifeCycleCosting/value).": "Agregue un objeto [`CostMeasurement`](../../reference/schema.md#costmeasurement) a la matriz  [`costMeasurements`](project-schema.json,,costMeasurements) y mapee a su [`.lifeCycleCosting.value`](project-schema.json,/definitions/CostMeasurement,lifeCycleCosting/value)."  # noqa: E501
             }[args[0]]
 
-    mapping_yaml = dedent(
+    mapping = dedent(
         """\
         -   id: '1.1'
             title: Procurement strategy
@@ -458,14 +451,14 @@ def test_translate_yaml(monkeypatch, caplog):
 
     with TemporaryDirectory() as sourcedir:
         with open(os.path.join(sourcedir, 'sustainability.yaml'), 'w') as f:
-            f.write(mapping_yaml)
+            f.write(mapping)
 
         with open(os.path.join(sourcedir, 'untranslated.yaml'), 'w') as f:
-            f.write(mapping_yaml)
+            f.write(mapping)
 
         with TemporaryDirectory() as builddir:
             translate([
-                ([os.path.join(sourcedir, 'sustainability.yaml')], builddir, 'yaml'),
+                ([os.path.join(sourcedir, 'sustainability.yaml')], builddir, 'mappings'),
             ], '', 'es', headers, keys=['title', 'disclosure format', 'mapping'])
 
             with open(os.path.join(builddir, 'sustainability.yaml')) as f:
@@ -534,4 +527,4 @@ def test_translate_yaml(monkeypatch, caplog):
 
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
-    assert caplog.records[0].message == f'Translating to es using "yaml" domain, into {builddir}'
+    assert caplog.records[0].message == f'Translating to es using "mappings" domain, into {builddir}'
