@@ -20,9 +20,11 @@ and in ``babel_bods_schema.cfg``::
 
     [ocds_schema: schema/*.json]
 
-For OC4IDS, you can specifyin ``babel_oc4ids_sustainability_mapping.cfg``::
+For OC4IDS, you can specify in a Babel ``.cfg`` file::
 
-    [oc4ids_sustainability_mapping: mapping/sustainability.yaml]
+    [extractors]
+    yaml = ocds_babel.extract:extract_yaml
+    [yaml: mapping/sustainability.yaml]
     keys = title,disclosure format,mapping
 """
 
