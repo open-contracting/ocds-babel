@@ -42,7 +42,7 @@ from ocds_babel.util import text_to_translate
 
 
 def extract_codelist(fileobj, keywords, comment_tags, options):
-    """Yield each header, and the specified field values of a codelist CSV file."""
+    """Yield each header, and the values of the specified fields of a codelist CSV file."""
     headers = _get_option_as_list(options, 'headers')
     ignore = _get_option_as_list(options, 'ignore')
 
@@ -62,20 +62,19 @@ def extract_codelist(fileobj, keywords, comment_tags, options):
 
 def extract_schema(fileobj, keywords, comment_tags, options):
     """Yield the "title" and "description" values of a JSON Schema file."""
-    def _extract_schema(data, pointer=''):
+    def _extract_schema(data, pointer):
         if isinstance(data, list):
             for index, item in enumerate(data):
                 yield from _extract_schema(item, pointer=f'{pointer}/{index}')
         elif isinstance(data, dict):
             for key, value in data.items():
-                yield from _extract_schema(value, pointer=f'{pointer}/{key}')
+                new_pointer = f'{pointer}/{key}'
+                yield from _extract_schema(value, pointer=new_pointer)
                 text = text_to_translate(value, key in TRANSLATABLE_SCHEMA_KEYWORDS)
                 if text:
-                    yield text, f'{pointer}/{key}'
+                    yield 1, '', text, [new_pointer]
 
-    data = json.loads(fileobj.read().decode())
-    for text, pointer in _extract_schema(data):
-        yield 1, '', text, [pointer]
+    yield from _extract_schema(json.loads(fileobj.read().decode()), '')
 
 
 def extract_extension_metadata(fileobj, keywords, comment_tags, options):
@@ -101,21 +100,20 @@ def extract_yaml(fileobj, keywords, comment_tags, options):
     import yaml
 
     keys = _get_option_as_list(options, 'keys')
-    def _extract_yaml(data, pointer=''):
+
+    def _extract_yaml(data, pointer):
         if isinstance(data, list):
             for index, item in enumerate(data):
                 yield from _extract_yaml(item, pointer=f'{pointer}/{index}')
         elif isinstance(data, dict):
             for key, value in data.items():
-                yield from _extract_yaml(value, pointer=f'{pointer}/{key}')
+                new_pointer = f'{pointer}/{key}'
+                yield from _extract_yaml(value, pointer=new_pointer)
                 text = text_to_translate(value, key in keys)
                 if text:
-                    yield text, f'{pointer}/{key}'
+                    yield 1, '', text, [new_pointer]
 
-    data = yaml.safe_load(fileobj.read().decode())
-
-    for text, pointer in _extract_yaml(data):
-        yield 1, '', text, [pointer]
+    yield from _extract_yaml(yaml.safe_load(fileobj.read().decode()), '')
 
 
 def _get_option_as_list(options, key):
