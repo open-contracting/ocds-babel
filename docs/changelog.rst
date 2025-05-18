@@ -1,9 +1,10 @@
 Changelog
 =========
 
-Unreleased
-----------
+0.3.7 (2025-05-18)
+------------------
 
+-  Add support for YAML files.
 -  Drop support for Python 3.8.
 
 0.3.6 (2024-09-07)
