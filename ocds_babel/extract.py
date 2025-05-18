@@ -1,35 +1,29 @@
 """
 Babel extractors can be specified in configuration files.
 
-For OCDS, you can specify::
+For OCDS, you can specify in ``babel_ocds_codelist.cfg``::
 
     [ocds_codelist: schema/*/codelists/*.csv]
     headers = Title,Description,Extension
     ignore = currency.csv
 
-in ``babel_ocds_codelist.cfg``, and::
+and in ``babel_ocds_schema.cfg``::
 
     [ocds_schema: schema/*/*-schema.json]
 
-in ``babel_ocds_schema.cfg``.
-
-For BODS, you can specify::
+For BODS, you can specify in ``babel_bods_codelist.cfg``::
 
     [ocds_codelist: schema/codelists/*.csv]
     headers = title,description,technical note
 
-in ``babel_bods_codelist.cfg``, and::
+and in ``babel_bods_schema.cfg``::
 
     [ocds_schema: schema/*.json]
 
-in ``babel_bods_schema.cfg``.
-
-For OC4IDS, you can specify::
+For OC4IDS, you can specifyin ``babel_oc4ids_sustainability_mapping.cfg``::
 
     [oc4ids_sustainability_mapping: mapping/sustainability.yaml]
     keys = title,disclosure format,mapping
-
-in ``babel_oc4ids_sustainability_mapping.cfg``.
 """
 
 import csv
