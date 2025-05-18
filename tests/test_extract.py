@@ -1,7 +1,7 @@
 import os
 from tempfile import TemporaryDirectory
 
-from ocds_babel.extract import extract_codelist, extract_extension_metadata, extract_schema
+from ocds_babel.extract import extract_codelist, extract_extension_metadata, extract_schema, extract_yaml
 
 options = {
     'headers': 'Title,Description,Extension',
@@ -15,36 +15,6 @@ codelist = b"""Code,Title,Description,Extension,Category
   bzz  ,  zzz  ,  foo  ,       ,  baz  
 """  # noqa: W291
 
-schema = b"""{
-    "title": {
-        "oneOf": [{
-            "title": "  foo  ",
-            "description": "  bar  "
-        }, {
-            "title": "  baz  ",
-            "description": "  bzz  "
-        }]
-    },
-    "description": {
-        "title": "  zzz  ",
-        "description": "    "
-    }
-}"""
-
-metadata_language_map = b"""{
-    "name": {
-        "en": "  foo  "
-    },
-    "description": {
-        "en": "  bar  "
-    }
-}"""
-
-
-metadata = b"""{
-    "name": "  foo  ",
-    "description": "  bar  "
-}"""
 
 
 def assert_result(filename, content, method, options, expected):
@@ -98,6 +68,22 @@ def test_extract_codelist_newline():
 
 
 def test_extract_schema():
+    schema = b"""{
+        "title": {
+            "oneOf": [{
+                "title": "  foo  ",
+                "description": "  bar  "
+            }, {
+                "title": "  baz  ",
+                "description": "  bzz  "
+            }]
+        },
+        "description": {
+            "title": "  zzz  ",
+            "description": "    "
+        }
+    }"""
+
     assert_result('schema.json', schema, extract_schema, None, [
         (1, '', 'foo', ['/title/oneOf/0/title']),
         (1, '', 'bar', ['/title/oneOf/0/description']),
@@ -108,6 +94,11 @@ def test_extract_schema():
 
 
 def test_extract_extension_metadata():
+    metadata = b"""{
+        "name": "  foo  ",
+        "description": "  bar  "
+    }"""
+
     assert_result('extension.json', metadata, extract_extension_metadata, None, [
         (1, '', 'foo', ['/name']),
         (1, '', 'bar', ['/description']),
@@ -115,6 +106,15 @@ def test_extract_extension_metadata():
 
 
 def test_extract_extension_metadata_language_map():
+    metadata_language_map = b"""{
+        "name": {
+            "en": "  foo  "
+        },
+        "description": {
+            "en": "  bar  "
+        }
+    }"""
+
     assert_result('extension.json', metadata_language_map, extract_extension_metadata, None, [
         (1, '', 'foo', ['/name/en']),
         (1, '', 'bar', ['/description/en']),
@@ -123,3 +123,28 @@ def test_extract_extension_metadata_language_map():
 
 def test_extract_extension_metadata_empty():
     assert_result('extension.json', b'{}', extract_extension_metadata, None, [])
+
+
+def test_extract_yaml_list():
+    yaml_list = b"""
+    -   id: '1'
+        title: foo
+    -   id: '1'
+        mapping: bar
+    """
+
+    assert_result('test.yaml', yaml_list, extract_yaml, {'keys': 'title,mapping'}, [
+        (1, '', 'foo', ['/0/title']),
+        (1, '', 'bar', ['/1/mapping']),
+    ])
+
+def test_extract_yaml_obj():
+    yaml_obj = b"""
+    foo: bar
+    baz: bzz
+    """
+
+    assert_result('test.yaml', yaml_obj, extract_yaml, {'keys': 'foo,baz'}, [
+        (1, '', 'bar', ['/foo']),
+        (1, '', 'bzz', ['/baz']),
+    ])

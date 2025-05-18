@@ -5,113 +5,22 @@ import logging
 import os
 from glob import glob
 from tempfile import TemporaryDirectory
+from textwrap import dedent
+
+import yaml
 
 from ocds_babel.translate import translate
 
 headers = ['Title', 'Description', 'Extension']
 
-codelist = """Code,Title,Description
-open,  Open  ,  All interested suppliers may submit a tender.  
-selective,  Selective  ,  Only qualified suppliers are invited to submit a tender.  
-"""  # noqa: W291
 
-schema = """{
-  "title": "Schema for an Open Contracting Record package {{version}} [{{lang}}]",
-  "description": "The record package contains a list of records along with some publishing…",
-  "definitions": {
-    "record": {
-      "properties": {
-        "releases": {
-          "title": "Releases",
-          "description": "An array of linking identifiers or releases",
-          "oneOf": [
-            {
-              "title": "  Linked releases  ",
-              "description": "  A list of objects that identify the releases associated with this Open…  "
-            },
-            {
-              "title": "  Embedded releases  ",
-              "description": "  A list of releases, with all the data. The releases MUST be sorted into date…  "
-            }
-          ]
-        }
-      }
-    }
-  }
-}"""
-
-extension_metadata = """{
-  "name": "  Location  ",
-  "description": "  Communicates the location of proposed or executed contract delivery.  ",
-  "compatibility": [
-    "1.1"
-  ]
-}"""
-
-extension_metadata_language_map = """{
-  "name": {
-    "en": "  Location  "
-  },
-  "description": {
-    "en": "  Communicates the location of proposed or executed contract delivery.  "
-  },
-  "compatibility": [
-    "1.1"
-  ]
-}"""
-
-extension_readme = """##### Skip Heading
-
-# Heading 1
-
-## Heading 2
-
-### Heading **3**
-
-Paragraph text and ```literal text```
-
-`Literal text`
-
-> Blockquote text
-
-    Raw paragraph text
-
-```
-Literal block
-```
-
-```json
-{
-    "json": "block"
-}
-```
-
-<h3>Subheading</h3>
-
-![Caption](http://example.com/example.png)
-
-This is a [pending](examples/test.md) xref.
-
-This is a **[bold link](http://example.com/test.md)**.
-
-This is <em>inline HTML</em>.
-
-* Bulleted list item 1
-* Bulleted list item 2
-
-1. Enumerated list item 1
-2. Enumerated list item 2
-
-* [Link list item 1](http://example.com/en/1.html)
-* [Link list item 2](http://example.com/en/2.html)
-"""
+class Base:
+    def __init__(self, *args, **kwargs):
+        pass
 
 
 def test_translate_codelists(monkeypatch, caplog):
-    class Translation:
-        def __init__(self, *args, **kwargs):
-            pass
-
+    class Translation(Base):
         def gettext(self, *args, **kwargs):
             return {
                 'Code': 'Código',
@@ -122,6 +31,14 @@ def test_translate_codelists(monkeypatch, caplog):
                 'All interested suppliers may submit a tender.': 'Todos los proveedores interesados pueden enviar una propuesta.',  # noqa: E501
                 'Only qualified suppliers are invited to submit a tender.': 'Sólo los proveedores calificados son invitados a enviar una propuesta.',  # noqa: E501
             }[args[0]]
+
+    codelist = dedent(
+        """\
+        Code,Title,Description
+        open,  Open  ,  All interested suppliers may submit a tender.  
+        selective,  Selective  ,  Only qualified suppliers are invited to submit a tender.  
+        """  # noqa: W291
+    )
 
     monkeypatch.setattr(gettext, 'translation', Translation)
 
@@ -155,10 +72,7 @@ def test_translate_codelists(monkeypatch, caplog):
 
 
 def test_translate_schema(monkeypatch, caplog):
-    class Translation:
-        def __init__(self, *args, **kwargs):
-            pass
-
+    class Translation(Base):
         def gettext(self, *args, **kwargs):
             return {
                 'Schema for an Open Contracting Record package {{version}} [{{lang}}]': 'Esquema para un paquete de Registros de Contrataciones Abiertas {{version}} [{{lang}}]',  # noqa: E501
@@ -170,6 +84,31 @@ def test_translate_schema(monkeypatch, caplog):
                 'Embedded releases': 'Entregas embebidas',
                 'A list of releases, with all the data. The releases MUST be sorted into date…':  'Una lista de entregas, con todos los datos. Las entregas DEBEN ordenarse…',  # noqa: E501
             }[args[0]]
+
+    schema = """{
+      "title": "Schema for an Open Contracting Record package {{version}} [{{lang}}]",
+      "description": "The record package contains a list of records along with some publishing…",
+      "definitions": {
+        "record": {
+          "properties": {
+            "releases": {
+              "title": "Releases",
+              "description": "An array of linking identifiers or releases",
+              "oneOf": [
+                {
+                  "title": "  Linked releases  ",
+                  "description": "  A list of objects that identify the releases associated with this Open…  "
+                },
+                {
+                  "title": "  Embedded releases  ",
+                  "description": "  A list of releases, with all the data. The releases MUST be sorted into date…  "
+                }
+              ]
+            }
+          }
+        }
+      }
+    }"""
 
     monkeypatch.setattr(gettext, 'translation', Translation)
 
@@ -223,6 +162,26 @@ def test_translate_schema(monkeypatch, caplog):
 
 
 def test_translate_extension_metadata(monkeypatch, caplog):
+    extension_metadata = """{
+      "name": "  Location  ",
+      "description": "  Communicates the location of proposed or executed contract delivery.  ",
+      "compatibility": [
+        "1.1"
+      ]
+    }"""
+
+    extension_metadata_language_map = """{
+      "name": {
+        "en": "  Location  "
+      },
+      "description": {
+        "en": "  Communicates the location of proposed or executed contract delivery.  "
+      },
+      "compatibility": [
+        "1.1"
+      ]
+    }"""
+
     for metadata in (extension_metadata, extension_metadata_language_map):
         class Translation:
             def __init__(self, *args, **kwargs):
@@ -270,10 +229,7 @@ def test_translate_extension_metadata(monkeypatch, caplog):
 
 
 def test_translate_markdown(monkeypatch, caplog):
-    class Translation:
-        def __init__(self, *args, **kwargs):
-            pass
-
+    class Translation(Base):
         def gettext(self, *args, **kwargs):
             return {
                 'Skip Heading': 'Entête à sauter',
@@ -295,6 +251,55 @@ def test_translate_markdown(monkeypatch, caplog):
                 '[Link list item 2](http://example.com/en/2.html)': '[Élément de liste de liens 2](http://example.com/fr/2.html)',
                 '': '',
             }[args[0]]
+
+    extension_readme = dedent(
+        """\
+        ##### Skip Heading
+
+        # Heading 1
+
+        ## Heading 2
+
+        ### Heading **3**
+
+        Paragraph text and ```literal text```
+
+        `Literal text`
+
+        > Blockquote text
+
+            Raw paragraph text
+
+        ```
+        Literal block
+        ```
+
+        ```json
+        {
+            "json": "block"
+        }
+        ```
+
+        <h3>Subheading</h3>
+
+        ![Caption](http://example.com/example.png)
+
+        This is a [pending](examples/test.md) xref.
+
+        This is a **[bold link](http://example.com/test.md)**.
+
+        This is <em>inline HTML</em>.
+
+        * Bulleted list item 1
+        * Bulleted list item 2
+
+        1. Enumerated list item 1
+        2. Enumerated list item 2
+
+        * [Link list item 1](http://example.com/en/1.html)
+        * [Link list item 2](http://example.com/en/2.html)
+        """
+    )
 
     monkeypatch.setattr(gettext, 'translation', Translation)
 
@@ -363,3 +368,163 @@ Ceci est <em>HTML en ligne</em>.
     assert len(caplog.records) == 1
     assert caplog.records[0].levelname == 'INFO'
     assert caplog.records[0].message == f'Translating to fr using "docs" domain, into {builddir}'
+
+
+def test_translate_yaml(monkeypatch, caplog):
+    class Translation(Base):
+        def gettext(self, *args, **kwargs):
+            return {
+                "Procurement strategy": "Estrategia de adquisición",
+                "Disclose the procurement strategy risk assessment. This tends to be part of the decision-making strategy and likely includes discussions regarding capabilities, the delivery model and the rationale for the risk allocation decision.": "Se refiere a la evaluación de riesgo de la estrategia de adquisiciones y contrataciones. Esto suele ser parte de la estrategia de toma de decisiones y es probable que incluya discusiones sobre las capacidades, el modelo de implementación y la justificación para la decisión de asignación de riesgos. ",  # noqa: E501
+                "Project Level:\n\n[Add a project document](../common.md#add-a-project-document) and set its [`.documentType`](project-schema.json,/definitions/Document,documentType) to 'procurementStrategyRiskAssessment'.": "[Agregar un documento de proyecto](../common.md#add-a-project-document) y configurar el [`.documentType`](project-schema.json,/definitions/Document,documentType) a 'procurementStrategyRiskAssessment'.",  # noqa: E501
+                "Life cycle cost": "Costos del ciclo de vida",
+                "Disclose the life cycle cost of the project, which is the cost of an asset throughout its life cycle while fulfilling the performance requirements (ISO 15686-5:2017).": "Son los costos en los que se incurren durante el ciclo de vida del proyecto, es decir el costo de un activo durante todo su ciclo de vida útil, mientras cumple con los requerimientos del desempeño esperado (ISO 15686-5:2017).",  # noqa: E501
+                "Project Level:\n\nAdd a [`CostMeasurement`](../../reference/schema.md#costmeasurement) object to the [`costMeasurements`](project-schema.json,,costMeasurements) array and map to its [`.lifeCycleCosting.value`](project-schema.json,/definitions/CostMeasurement,lifeCycleCosting/value).": "Agregue un objeto [`CostMeasurement`](../../reference/schema.md#costmeasurement) a la matriz  [`costMeasurements`](project-schema.json,,costMeasurements) y mapee a su [`.lifeCycleCosting.value`](project-schema.json,/definitions/CostMeasurement,lifeCycleCosting/value)."  # noqa: E501
+            }[args[0]]
+
+    mapping = dedent(
+        """\
+        -   id: '1.1'
+            title: Procurement strategy
+            module: Economic and fiscal
+            indicator: Procurement viability
+            disclosure format: Disclose the procurement strategy risk assessment. This tends to be part of the decision-making strategy and likely includes discussions regarding capabilities, the delivery model and the rationale for the risk allocation decision.
+            mapping: |-
+                Project Level:
+
+                [Add a project document](../common.md#add-a-project-document) and set its [`.documentType`](project-schema.json,/definitions/Document,documentType) to 'procurementStrategyRiskAssessment'.
+            example: |-
+                {
+                  "documents": [
+                    {
+                      "id": "1",
+                      "title": "Procurement strategy risk assessment",
+                      "documentType": "procurementStrategyRiskAssessment",
+                      "url": "http://example.com/documents/procurementStrategyRiskAssessment.pdf"
+                    }
+                  ]
+                }
+            fields:
+            - /documents
+            - /documents/id
+            - /documents/title
+            - /documents/documentType
+            - /documents/url
+            refs: ''
+        -   id: '1.2'
+            title: Life cycle cost
+            module: Economic and fiscal
+            indicator: Economic viability
+            disclosure format: Disclose the life cycle cost of the project, which is the cost of an asset throughout its life cycle while fulfilling the performance requirements (ISO 15686-5:2017).
+            mapping: |-
+                Project Level:
+
+                Add a [`CostMeasurement`](../../reference/schema.md#costmeasurement) object to the [`costMeasurements`](project-schema.json,,costMeasurements) array and map to its [`.lifeCycleCosting.value`](project-schema.json,/definitions/CostMeasurement,lifeCycleCosting/value).
+            example: |-
+                {
+                  "costMeasurements": [
+                    {
+                      "id": "1",
+                      "lifeCycleCosting": {
+                        "value": {
+                          "amount": 10000000,
+                          "currency": "USD"
+                        }
+                      }
+                    }
+                  ]
+                }
+            fields:
+            - /costMeasurements
+            - /costMeasurements/id
+            - /costMeasurements/lifeCycleCosting
+            - /costMeasurements/lifeCycleCosting/value
+            - /costMeasurements/lifeCycleCosting/value/amount
+            - /costMeasurements/lifeCycleCosting/value/currency
+            refs: ''
+        """  # noqa: E501
+    )
+
+    monkeypatch.setattr(gettext, 'translation', Translation)
+
+    caplog.set_level(logging.INFO)
+
+    with TemporaryDirectory() as sourcedir:
+        with open(os.path.join(sourcedir, 'sustainability.yaml'), 'w') as f:
+            f.write(mapping)
+
+        with open(os.path.join(sourcedir, 'untranslated.yaml'), 'w') as f:
+            f.write(mapping)
+
+        with TemporaryDirectory() as builddir:
+            translate([
+                ([os.path.join(sourcedir, 'sustainability.yaml')], builddir, 'mappings'),
+            ], '', 'es', headers, keys=['title', 'disclosure format', 'mapping'])
+
+            with open(os.path.join(builddir, 'sustainability.yaml')) as f:
+                data = yaml.safe_load(f)
+
+            assert not os.path.exists(os.path.join(builddir, 'untranslated.yaml'))
+
+    assert data == [
+        {
+            "id": "1.1",
+            "title": "Estrategia de adquisición",
+            "module": "Economic and fiscal",
+            "indicator": "Procurement viability",
+            "disclosure format": "Se refiere a la evaluación de riesgo de la estrategia de adquisiciones y contrataciones. Esto suele ser parte de la estrategia de toma de decisiones y es probable que incluya discusiones sobre las capacidades, el modelo de implementación y la justificación para la decisión de asignación de riesgos. ",  # noqa: E501
+            "mapping": "[Agregar un documento de proyecto](../common.md#add-a-project-document) y configurar el [`.documentType`](project-schema.json,/definitions/Document,documentType) a 'procurementStrategyRiskAssessment'.",  # noqa: E501
+            "example": """{
+  "documents": [
+    {
+      "id": "1",
+      "title": "Procurement strategy risk assessment",
+      "documentType": "procurementStrategyRiskAssessment",
+      "url": "http://example.com/documents/procurementStrategyRiskAssessment.pdf"
+    }
+  ]
+}""",
+            "fields": [
+              "/documents",
+              "/documents/id",
+              "/documents/title",
+              "/documents/documentType",
+              "/documents/url"
+            ],
+            "refs": ""
+        },
+        {
+            "id": "1.2",
+            "title": "Costos del ciclo de vida",
+            "module": "Economic and fiscal",
+            "indicator": "Economic viability",
+            "disclosure format": "Son los costos en los que se incurren durante el ciclo de vida del proyecto, es decir el costo de un activo durante todo su ciclo de vida útil, mientras cumple con los requerimientos del desempeño esperado (ISO 15686-5:2017).",  # noqa: E501
+            "mapping": "Agregue un objeto [`CostMeasurement`](../../reference/schema.md#costmeasurement) a la matriz  [`costMeasurements`](project-schema.json,,costMeasurements) y mapee a su [`.lifeCycleCosting.value`](project-schema.json,/definitions/CostMeasurement,lifeCycleCosting/value).",  # noqa: E501
+            "example": """{
+  "costMeasurements": [
+    {
+      "id": "1",
+      "lifeCycleCosting": {
+        "value": {
+          "amount": 10000000,
+          "currency": "USD"
+        }
+      }
+    }
+  ]
+}""",
+            "fields": [
+              "/costMeasurements",
+              "/costMeasurements/id",
+              "/costMeasurements/lifeCycleCosting",
+              "/costMeasurements/lifeCycleCosting/value",
+              "/costMeasurements/lifeCycleCosting/value/amount",
+              "/costMeasurements/lifeCycleCosting/value/currency"
+            ],
+            "refs": ""
+        }
+    ]
+
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'INFO'
+    assert caplog.records[0].message == f'Translating to es using "mappings" domain, into {builddir}'

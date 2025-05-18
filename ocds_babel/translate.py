@@ -34,7 +34,7 @@ The arguments to :code:`translate` are:
 #. Target language (the code of the language to translate to)
 #. Optional keyword arguments to replace ``{{marker}}`` markers with values, e.g. :code:`version='1.1'`
 
-Methods are also available for translating ``extension.json`` and for translating Markdown files.
+Methods are also available for translating ``extension.json``, Markdown files and YAML files.
 
 Install requirements for Markdown translation
 ---------------------------------------------
@@ -44,6 +44,15 @@ To translate Markdown files, you must install:
 .. code-block:: bash
 
     pip install ocds-babel[markdown]
+
+Install requirements for YAML translation
+-----------------------------------------
+
+To translate YAML files, you must install:
+
+.. code-block:: bash
+
+    pip install ocds-babel[yaml]
 """
 
 import contextlib
@@ -61,15 +70,19 @@ from ocds_babel.util import text_to_translate
 with contextlib.suppress(ImportError):
     from ocds_babel.translate_markdown import translate_markdown, translate_markdown_data  # noqa: F401
 
+with contextlib.suppress(ImportError):
+    from ocds_babel.translate_yaml import translate_yaml, translate_yaml_data  # noqa: F401
+
 logger = logging.getLogger('ocds_babel')
 
 
-def translate(configuration, localedir, language, headers, **kwargs):
+def translate(configuration, localedir, language, headers, keys=None, **kwargs):
     """
     Write files, translating any translatable strings.
 
-    For translated strings in schema files, replace `{{lang}}` with the language code. Keyword arguments may specify
-    additional replacements.
+    For translated strings in schema files, replace `{{lang}}` with the language code.
+
+    Keyword arguments may specify additional replacements.
     """
     translators = {}
 
@@ -83,21 +96,25 @@ def translate(configuration, localedir, language, headers, **kwargs):
 
         for source in sources:
             basename = os.path.basename(source)
+            if basename == 'extension.json':
+                method = translate_extension_metadata
+                new_kwargs = {'lang': language}
+            elif source.endswith('.csv'):
+                method = translate_codelist
+                new_kwargs = {'headers': headers}
+            elif source.endswith('.json'):
+                method = translate_schema
+                new_kwargs = {'lang': language}
+            elif source.endswith('.md'):
+                method = translate_markdown
+                new_kwargs = {}
+            elif source.endswith('.yaml'):
+                method = translate_yaml
+                new_kwargs = {'keys': keys}
+            else:
+                raise NotImplementedError(basename)
             with open(source) as r, open(os.path.join(target, basename), 'w') as w:
-                if basename == 'extension.json':
-                    method = translate_extension_metadata
-                    kwargs.update(lang=language)
-                elif source.endswith('.csv'):
-                    method = translate_codelist
-                    kwargs.update(headers=headers)
-                elif source.endswith('.json'):
-                    method = translate_schema
-                    kwargs.update(lang=language)
-                elif source.endswith('.md'):
-                    method = translate_markdown
-                else:
-                    raise NotImplementedError(basename)
-                w.write(method(r, translators[domain], **kwargs))
+                w.write(method(r, translators[domain], **new_kwargs, **kwargs))
 
 
 # This should roughly match the logic of `extract_codelist`.
