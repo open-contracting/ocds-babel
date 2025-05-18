@@ -44,6 +44,15 @@ To translate Markdown files, you must install:
 .. code-block:: bash
 
     pip install ocds-babel[markdown]
+
+Install requirements for YAML translation
+-----------------------------------------
+
+To translate YAML files, you must install:
+
+.. code-block:: bash
+
+    pip install ocds-babel[yaml]
 """
 
 import contextlib
@@ -55,23 +64,25 @@ import os
 from copy import deepcopy
 from io import StringIO
 
-import yaml
-
 from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS
 from ocds_babel.util import text_to_translate
 
 with contextlib.suppress(ImportError):
     from ocds_babel.translate_markdown import translate_markdown, translate_markdown_data  # noqa: F401
 
+with contextlib.suppress(ImportError):
+    from ocds_babel.translate_yaml import translate_yaml, translate_yaml_data  # noqa: F401
+
 logger = logging.getLogger('ocds_babel')
 
 
-def translate(configuration, localedir, language, headers, keys, **kwargs):
+def translate(configuration, localedir, language, headers, keys=None, **kwargs):
     """
     Write files, translating any translatable strings.
 
-    For translated strings in schema files, replace `{{lang}}` with the language code. Keyword arguments may specify
-    additional replacements.
+    For translated strings in schema files, replace `{{lang}}` with the language code.
+
+    Keyword arguments may specify additional replacements.
     """
     translators = {}
 
@@ -85,24 +96,25 @@ def translate(configuration, localedir, language, headers, keys, **kwargs):
 
         for source in sources:
             basename = os.path.basename(source)
+            if basename == 'extension.json':
+                method = translate_extension_metadata
+                new_kwargs = {'lang': language}
+            elif source.endswith('.csv'):
+                method = translate_codelist
+                new_kwargs = {'headers': headers}
+            elif source.endswith('.json'):
+                method = translate_schema
+                new_kwargs = {'lang': language}
+            elif source.endswith('.md'):
+                method = translate_markdown
+                new_kwargs = {}
+            elif source.endswith('.yaml'):
+                method = translate_yaml
+                new_kwargs = {'keys': keys}
+            else:
+                raise NotImplementedError(basename)
             with open(source) as r, open(os.path.join(target, basename), 'w') as w:
-                if basename == 'extension.json':
-                    method = translate_extension_metadata
-                    kwargs.update(lang=language)
-                elif source.endswith('.csv'):
-                    method = translate_codelist
-                    kwargs.update(headers=headers)
-                elif source.endswith('.json'):
-                    method = translate_schema
-                    kwargs.update(lang=language)
-                elif source.endswith('.md'):
-                    method = translate_markdown
-                elif source.endswith('.yaml'):
-                    method = translate_yaml
-                    kwargs.update(keys=keys)
-                else:
-                    raise NotImplementedError(basename)
-                w.write(method(r, translators[domain], **kwargs))
+                w.write(method(r, translators[domain], **new_kwargs, **kwargs))
 
 
 # This should roughly match the logic of `extract_codelist`.
@@ -187,36 +199,6 @@ def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
         if text:
             data[key] = {lang: translator.gettext(text)}
 
-    return data
-
-
-# This should roughly match the logic of `extract_yaml`.
-def translate_yaml(io, translator, keys=(), **kwargs):
-    """Accept a YAML file as an IO object, and return its translated contents in YAML format."""
-    data = yaml.safe_load(io)
-
-    data = translate_yaml_data(data, translator, keys, **kwargs)
-
-    return yaml.safe_dump(data, default_flow_style=False, allow_unicode=True)
-
-
-def translate_yaml_data(source, translator, keys=(), **kwargs):
-    """Accept YAML data, and return translated data."""
-    def _translate_yaml_data(data):
-        if isinstance(data, list):
-            for item in data:
-                _translate_yaml_data(item)
-        elif isinstance(data, dict):
-            for key, value in data.items():
-                _translate_yaml_data(value)
-                text = text_to_translate(value, key in keys)
-                if text:
-                    data[key] = translator.gettext(text)
-                    for old, new in kwargs.items():
-                        data[key] = data[key].replace('{{' + old + '}}', new)
-
-    data = deepcopy(source)
-    _translate_yaml_data(data)
     return data
 
 
