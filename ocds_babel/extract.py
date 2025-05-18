@@ -37,8 +37,6 @@ import json
 import os
 from io import StringIO
 
-import yaml
-
 from ocds_babel import TRANSLATABLE_EXTENSION_METADATA_KEYWORDS, TRANSLATABLE_SCHEMA_KEYWORDS
 from ocds_babel.util import text_to_translate
 
@@ -100,6 +98,8 @@ def extract_extension_metadata(fileobj, keywords, comment_tags, options):
 
 def extract_yaml(fileobj, keywords, comment_tags, options):
     """Yield the values of the specified keys of a YAML file."""
+    import yaml
+
     keys = _get_option_as_list(options, 'keys')
     def _extract_yaml(data, pointer=''):
         if isinstance(data, list):
