@@ -93,7 +93,7 @@ def extract_extension_metadata(fileobj, keywords, comment_tags, options):
 
 def extract_yaml(fileobj, keywords, comment_tags, options):
     """Yield the values of the specified keys of a YAML file."""
-    import yaml
+    import yaml  # noqa: PLC0415
 
     keys = _get_option_as_list(options, 'keys')
 
