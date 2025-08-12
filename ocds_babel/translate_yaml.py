@@ -17,6 +17,7 @@ def translate_yaml(io, translator, keys=(), **kwargs):
 
 def translate_yaml_data(source, translator, keys=(), **kwargs):
     """Accept YAML data, and return translated data."""
+
     def _translate_yaml_data(data):
         if isinstance(data, list):
             for item in data:
@@ -28,7 +29,7 @@ def translate_yaml_data(source, translator, keys=(), **kwargs):
                 if text:
                     data[key] = translator.gettext(text)
                     for old, new in kwargs.items():
-                        data[key] = data[key].replace('{{' + old + '}}', new)
+                        data[key] = data[key].replace("{{" + old + "}}", new)
 
     data = deepcopy(source)
     _translate_yaml_data(data)

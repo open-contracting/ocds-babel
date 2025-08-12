@@ -73,7 +73,7 @@ with contextlib.suppress(ImportError):
 with contextlib.suppress(ImportError):
     from ocds_babel.translate_yaml import translate_yaml, translate_yaml_data  # noqa: F401
 
-logger = logging.getLogger('ocds_babel')
+logger = logging.getLogger("ocds_babel")
 
 
 def translate(configuration, localedir, language, headers, keys=None, **kwargs):
@@ -89,31 +89,32 @@ def translate(configuration, localedir, language, headers, keys=None, **kwargs):
     for sources, target, domain in configuration:
         logger.info('Translating to %s using "%s" domain, into %s', language, domain, target)
 
-        translators.setdefault(domain, gettext.translation(
-            domain, localedir, languages=[language], fallback=language == 'en'))
+        translators.setdefault(
+            domain, gettext.translation(domain, localedir, languages=[language], fallback=language == "en")
+        )
 
         os.makedirs(target, exist_ok=True)
 
         for source in sources:
             basename = os.path.basename(source)
-            if basename == 'extension.json':
+            if basename == "extension.json":
                 method = translate_extension_metadata
-                new_kwargs = {'lang': language}
-            elif source.endswith('.csv'):
+                new_kwargs = {"lang": language}
+            elif source.endswith(".csv"):
                 method = translate_codelist
-                new_kwargs = {'headers': headers}
-            elif source.endswith('.json'):
+                new_kwargs = {"headers": headers}
+            elif source.endswith(".json"):
                 method = translate_schema
-                new_kwargs = {'lang': language}
-            elif source.endswith('.md'):
+                new_kwargs = {"lang": language}
+            elif source.endswith(".md"):
                 method = translate_markdown
                 new_kwargs = {}
-            elif source.endswith('.yaml'):
+            elif source.endswith(".yaml"):
                 method = translate_yaml
-                new_kwargs = {'keys': keys}
+                new_kwargs = {"keys": keys}
             else:
                 raise NotImplementedError(basename)
-            with open(source) as r, open(os.path.join(target, basename), 'w') as w:
+            with open(source) as r, open(os.path.join(target, basename), "w") as w:
                 w.write(method(r, translators[domain], **new_kwargs, **kwargs))
 
 
@@ -126,7 +127,7 @@ def translate_codelist(io, translator, headers=(), **kwargs):
     rows = translate_codelist_data(reader, translator, headers, **kwargs)
 
     io = StringIO()
-    writer = csv.DictWriter(io, fieldnames, lineterminator='\n')
+    writer = csv.DictWriter(io, fieldnames, lineterminator="\n")
     writer.writeheader()
     writer.writerows(rows)
 
@@ -157,6 +158,7 @@ def translate_schema(io, translator, **kwargs):
 
 def translate_schema_data(source, translator, **kwargs):
     """Accept JSON data, and return translated data."""
+
     def _translate_schema_data(data):
         if isinstance(data, list):
             for item in data:
@@ -168,7 +170,7 @@ def translate_schema_data(source, translator, **kwargs):
                 if text:
                     data[key] = translator.gettext(text)
                     for old, new in kwargs.items():
-                        data[key] = data[key].replace('{{' + old + '}}', new)
+                        data[key] = data[key].replace("{{" + old + "}}", new)
 
     data = deepcopy(source)
     _translate_schema_data(data)
@@ -176,7 +178,7 @@ def translate_schema_data(source, translator, **kwargs):
 
 
 # This should roughly match the logic of `extract_extension_metadata`.
-def translate_extension_metadata(io, translator, lang='en', **kwargs):
+def translate_extension_metadata(io, translator, lang="en", **kwargs):
     """Accept an extension metadata file as an IO object, and return its translated contents in JSON format."""
     data = json.load(io)
 
@@ -185,7 +187,7 @@ def translate_extension_metadata(io, translator, lang='en', **kwargs):
     return _json_dumps(data)
 
 
-def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
+def translate_extension_metadata_data(source, translator, lang="en", **kwargs):
     """Accept extension metadata, and return translated metadata."""
     data = deepcopy(source)
 
@@ -193,7 +195,7 @@ def translate_extension_metadata_data(source, translator, lang='en', **kwargs):
         value = data.get(key)
 
         if isinstance(value, dict):
-            value = value.get('en')
+            value = value.get("en")
 
         text = text_to_translate(value)
         if text:

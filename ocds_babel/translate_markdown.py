@@ -17,7 +17,7 @@ def translate_markdown_data(name, md, translator, **kwargs):
 
     tokens = []
     for token in parser.parse(md, env):
-        if token.type == 'inline':
+        if token.type == "inline":
             new_token = parser.parse(translator.gettext(token.content))[1]
             new_token.level = token.level
             tokens.append(new_token)
