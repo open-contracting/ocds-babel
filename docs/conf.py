@@ -15,7 +15,7 @@ project = "OCDS Babel"
 copyright = "2018, Open Contracting Partnership"
 author = "Open Contracting Partnership"
 
-version = "0.3.6"
+version = "0.3.7"
 release = version
 
 # -- General configuration ---------------------------------------------------
