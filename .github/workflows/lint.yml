@@ -6,4 +6,4 @@ jobs:
     permissions:
       contents: read
     with:
-      standard-maintenance-scripts-extras: markdown
+      standard-maintenance-scripts-extras: markdown,yaml
