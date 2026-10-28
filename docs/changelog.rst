@@ -5,7 +5,7 @@ Unreleased
 ----------
 
 -  Add support for Python 3.13, 3.14.
--  Drop support for Python 3.9.
+-  Drop support for Python 3.9, 3.10.
 
 0.3.7 (2025-05-18)
 ------------------
